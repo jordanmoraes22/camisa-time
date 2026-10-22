@@ -20,7 +20,7 @@
     <img src="Logo.png" alt="Logo" class="logo">
     <h1>TREM DO ÓDIO EC</h1>
 
-    <button onclick="novo(ibotaoPedir)" class="btn btn-pedir">QUERO PEDIR MINHA CAMISA</button>
+    <button onclick="novoPedido()" class="btn btn-pedir">QUERO PEDIR MINHA CAMISA</button>
     <button onclick="pagarRestante()" class="btn btn-restante">PAGAR VALOR RESTANTE</button>
 
     <p class="aviso">Prazo de fabricação: 30 dias após confirmação do pagamento.</p>
@@ -28,9 +28,9 @@
     <a href="https://wa.me/5531991595612?text=Olá! Tenho dúvidas sobre a camisa do Trem do Ódio EC." target="_blank" class="support-btn">Tenho dúvidas / Falar no WhatsApp</a>
 
     <script>
-        function novo(ibotaoPedir) {
+        function novoPedido() {
             localStorage.clear();
-            window.location.href = 'patient.html';
+            window.location.href = 'pedido.html';
         }
 
         function pagarRestante() {

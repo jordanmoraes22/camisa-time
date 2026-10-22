@@ -51,18 +51,18 @@
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* AREA DO NOME - Limitada pelas linhas azuis (68% de largura) */
+        /* AREA DO NOME - Agora com 58% para ficar longe dos ombros */
         .txt-nome-container {
             position: absolute;
-            top: 22%; /* Posicionado na altura certa das costas */
+            top: 22%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 68%; /* LARGURA CRÍTICA: Ajustada para as suas linhas azuis */
+            width: 58%; /* REDUZIDO para não tocar os ombros */
             height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Garante que nada saia das linhas */
+            overflow: hidden;
         }
 
         #displayNome {
@@ -97,21 +97,23 @@
             margin-top: 20px;
             border-top: 4px solid var(--vermelho);
             box-sizing: border-box;
+            margin-bottom: 30px;
         }
         
-        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 11px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
+        label { display: block; text-align: left; margin: 12px 0 5px; font-size: 11px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
         
-        input { 
+        input, select { 
             width: 100%; 
             padding: 12px; 
-            margin-bottom: 10px; 
             border-radius: 5px; 
             border: 1px solid #444; 
             background: #000; 
             color: white; 
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 14px;
         }
+
+        input:focus, select:focus { border-color: var(--vermelho); outline: none; }
 
         button { 
             width: 100%; 
@@ -122,8 +124,9 @@
             font-size: 18px; 
             font-weight: bold; 
             border-radius: 5px; 
-            margin-top: 10px;
+            margin-top: 20px;
             text-transform: uppercase;
+            cursor: pointer;
         }
 
         .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
@@ -144,18 +147,40 @@
             <p class="legenda">COSTAS</p>
             <img src="Costas.png" class="camisa-img">
             <div class="txt-nome-container">
-                <span id="displayNome">MICHAEL JORDAN</span>
+                <span id="displayNome">JORDAN</span>
             </div>
             <div id="displayNumero" class="txt-numero">00</div>
         </div>
     </div>
 
     <div class="form-area">
+        <!-- Campo de Identificação -->
+        <label>Seu Nome Completo</label>
+        <input type="text" id="nomePessoa" placeholder="Para identificação do pedido">
+
+        <!-- Customização da Camisa -->
         <label>Nome na Camisa</label>
         <input type="text" id="nomeCamisa" placeholder="Ex: MICHAEL JORDAN" oninput="atualizar()">
         
         <label>Número (00-99)</label>
         <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
+
+        <!-- Tamanho -->
+        <label>Tamanho da Camisa</label>
+        <select id="tamanhoCamisa">
+            <option value="P">P</option>
+            <option value="M">M</option>
+            <option value="G">G</option>
+            <option value="GG">GG</option>
+            <option value="XG">XG (Sob consulta)</option>
+        </select>
+
+        <!-- Pagamento (Mantive para o fluxo fazer sentido) -->
+        <label>Opção de Pagamento</label>
+        <select id="pagamento">
+            <option value="50">PAGAR METADE (R$ 50,00)</option>
+            <option value="100">PAGAR TOTAL (R$ 100,00)</option>
+        </select>
         
         <button onclick="concluir()">CONCLUIR PEDIDO</button>
     </div>
@@ -179,18 +204,32 @@
             displayNumero.innerText = numInput === "" ? "00" : numInput.toString().padStart(2, '0');
 
             // 2. Atualiza o Nome
-            displayNome.innerText = nomeInput.toUpperCase() || "MICHAEL JORDAN";
+            displayNome.innerText = nomeInput.toUpperCase() || "JORDAN";
 
             // 3. LOGICA DE ENCAIXE RIGOROSO
-            let fontSize = 22; // Tamanho inicial máximo
+            let fontSize = 22; 
             displayNome.style.fontSize = fontSize + "px";
 
-            // Enquanto a largura real do texto (scrollWidth) for maior que o container (68%), 
-            // ele diminui a fonte de 1 em 1 pixel.
+            // Verifica se o nome cabe no container de 58% de largura
             while (displayNome.scrollWidth > container.offsetWidth && fontSize > 8) {
                 fontSize--;
                 displayNome.style.fontSize = fontSize + "px";
             }
+        }
+
+        function concluir() {
+            const nPessoa = document.getElementById('nomePessoa').value;
+            const nCamisa = document.getElementById('nomeCamisa').value;
+            const nNum = document.getElementById('numeroCamisa').value;
+            const tamanho = document.getElementById('tamanhoCamisa').value;
+
+            if(!nPessoa || !nCamisa || !nNum) {
+                alert("Por favor, preencha seu nome, o nome na camisa e o número!");
+                return;
+            }
+
+            // Próximo passo será a integração com Google Sheets e PIX
+            alert("Pedido de " + nPessoa + " (Tam: " + tamanho + ") registrado com sucesso!");
         }
     </script>
 </body>

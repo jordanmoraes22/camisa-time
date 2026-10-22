@@ -28,7 +28,7 @@
 <img src="Logo.png" alt="Logo" class="logo">
 <h1>TREM DO ÓDIO EC</h1>
 
-<button class="btn btn-pedir" onclick="novoPedido()">QUERO PEDIR MINHA CAMISA</button>
+<button class="btn btn-pedir" onclick="novo PEDIDO()">QUERO PEDIR MINHA CAMISA</button>
 <button class="btn btn-restante" onclick="abrirModalZap()">Pagar valor restante / Informar pagamento</button>
 
 <p class="aviso">Prazo de fabricação: 30 dias após confirmação do pagamento.</p>
@@ -47,15 +47,14 @@
 </div>
 
 <script>
-function novoPedido(){
+function novo PEDIDO(){
     localStorage.clear();
-    window.location.href='pedido.html';
+    window.location.href='ped.html';
 }
 
 /* ---- MODAL WHATSAPP ---- */
 function abrirModalZap(){ document.getElementById('modalZap').style.display='flex'; }
 function fecharModalZap(e){
-    // Fecha se clicou no fundo (overlay) ou no X
     if(e && e.target.id === 'modalZap' || !e){
         document.getElementById('modalZap').style.display='none';
         document.getElementById('zapInput').value='';
@@ -68,9 +67,8 @@ function pagarRestante(){
         alert('Telefone inválido – digite ao menos 10 números.');
         return;
     }
-    // Bloqueia se não houver pedido salvo
-    const temPedido = !!localStorage.getItem('pedidoCamisa');
-    if(!temPedido){
+    const tem PEDIDO = !!localStorage.getItem('pedCamisa');
+    if(!tem PEDIDO){
         alert('Você ainda não fez nenhum pedido. Volte e clique em "Quero Pedir Minha Camisa".');
         fecharModalZap();
         return;

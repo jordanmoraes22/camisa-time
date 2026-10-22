@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - Trem do Ódio EC</title>
+    <style>
+        :root { --vermelho: #cc0000; --preto: #000000; --cinza: #1a1a1a; }
+        body { font-family: 'Arial', sans-serif; background: var(--preto); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--cinza); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; border-top: 4px solid var(--vermelho); text-align: center; }
+        h2 { color: var(--vermelho); text-transform: uppercase; font-family: 'Impact'; }
+        .resumo { text-align: left; background: #000; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+        .resumo b { color: var(--vermelho); }
+        .btn-pagar { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-metade { background: #444; color: white; }
+        .btn-total { background: var(--vermelho); color: white; }
+        #areaPix { display: none; margin-top: 20px; background: #fff; color: #000; padding: 15px; border-radius: 8px; }
+        #codigoPix { word-break: break-all; font-family: monospace; font-size: 12px; margin: 10px 0; display: block; background: #eee; padding: 10px; }
+        .btn-copiar { background: #007bff; color: white; width: 100%; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-whatsapp { background: #25d366; color: white; width: 100%; border: none; padding: 15px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; text-transform: uppercase; }
+        .frete-msg { font-size: 11px; color: #888; margin-top: 10px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Resumo do Pedido</h2>
+        <div id="resumoPedido" class="resumo"></div>
+
+        <p>Escolha quanto deseja pagar agora:</p>
+        <button class="btn-pagar btn-metade" onclick="gerarPix(37.70, 'Metade')">Pagar Metade (R$ 37,70)</button>
+        <button class="btn-pagar btn-total" onclick="gerarPix(75.40, 'Total')">Pagar Total (R$ 75,40)</button>
+        
+        <p class="frete-msg">* Valor já inclui R$ 1,50 do Uber Entrega (porque eu não sou rico! 😂)</p>
+
+        <div id="areaPix">
+            <strong>PIX Copia e Cola gerado:</strong>
+            <span id="codigoPix"></span>
+            <button class="btn-copiar" onclick="copiarPix()">Copiar Código</button>
+        </div>
+
+        <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizarPedido()">Já Paguei! Enviar Comprovante</button>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec'; // <--- COLOQUE SUA URL AQUI
+        let pedido = JSON.parse(localStorage.getItem('pedidoCamisa'));
+        let valorSelecionado = 0;
+        let tipoPagamento = "";
+
+        if (!pedido) { window.location.href = "index.html"; }
+
+        document.getElementById('resumoPedido').innerHTML = `
+            👤 <b>Cliente:</b> ${pedido.identificacao}<br>
+            👕 <b>Nome na Camisa:</b> ${pedido.nomeCamisa.toUpperCase()}<br>
+            🔢 <b>Número:</b> ${pedido.numero}<br>
+            📏 <b>Tamanho:</b> ${pedido.tamanho}
+        `;
+
+        function gerarPix(valor, tipo) {
+            valorSelecionado = valor;
+            tipoPagamento = tipo;
+            const chave = "+5531991595612";
+            const nome = "Jordan Moraes";
+            const cidade = "Sao Paulo";
+
+            // Montagem básica do payload PIX estático
+            const v = valor.toFixed(2).toString();
+            const payloadLivre = `00020126360014br.gov.bcb.pix0114${chave}52040000530398654${v.length.toString().padStart(2, '0')}${v}5802BR59${nome.length.toString().padStart(2, '0')}${nome}60${cidade.length.toString().padStart(2, '0')}${cidade}62070503***`;
+            
+            // Cálculo do CRC16 simples
+            const codigoFinal = payloadLivre + crc16(payloadLivre);
+
+            document.getElementById('codigoPix').innerText = codigoFinal;
+            document.getElementById('areaPix').style.display = "block";
+            document.getElementById('btnWhatsapp').style.display = "block";
+        }
+
+        function copiarPix() {
+            const texto = document.getElementById('codigoPix').innerText;
+            navigator.clipboard.writeText(texto);
+            alert("Código PIX copiado!");
+        }
+
+        async function finalizarPedido() {
+            const finalData = { ...pedido, valorPago: valorSelecionado, opcaoPagamento: tipoPagamento };
+
+            // Envia para a Planilha
+            try {
+                await fetch(scriptURL, { method: 'POST', body: JSON.stringify(finalData) });
+            } catch (e) { console.error("Erro ao salvar planilha"); }
+
+            // Monta a mensagem do WhatsApp
+            let msgPag = tipoPagamento === 'Metade' ? 'metade' : 'o valor total, to com a folha';
+            const textoZap = `Fala bonitão,\nPaguei ${msgPag} (R$ ${valorSelecionado.toFixed(2)}), quando puder confere ai na conta. E aqui, domingo (25/10) é 13 nas cabeças.\n\n*Pedido:* Camisa ${pedido.nomeCamisa.toUpperCase()} - Nº ${pedido.numero} - Tam ${pedido.tamanho}\n*Atleta:* ${pedido.identificacao}`;
+            
+            const linkZap = `https://api.whatsapp.com/send?phone=5531991595612&text=${encodeURIComponent(textoZap)}`;
+            window.open(linkZap, '_blank');
+        }
+
+        // Função auxiliar CRC16
+        function crc16(str) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < str.length; i++) {
+                crc ^= str.charCodeAt(i) << 8;
+                for (let j = 0; j < 8; j++) {
+                    if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021;
+                    else crc <<= 1;
+                }
+            }
+            return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+        }
+    </script>
+</body>
+</html>

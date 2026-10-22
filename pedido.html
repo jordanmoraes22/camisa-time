@@ -25,6 +25,7 @@ button:disabled{background:#666;opacity:.7;cursor:not-allowed}
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:100}
 .modal-content{max-width:90%;max-height:80%;border-radius:10px}
 .modal-close{position:absolute;top:20px;right:25px;color:#fff;font-size:45px;font-weight:bold;cursor:pointer;z-index:110}
+.status-msg{margin-top:15px;font-size:14px;font-weight:bold;height:20px}
 </style>
 </head>
 <body>
@@ -66,6 +67,7 @@ button:disabled{background:#666;opacity:.7;cursor:not-allowed}
         <button class="btnInfo" onclick="abrirModal()">i</button>
     </div>
 
+    <div id="statusMsg" class="status-msg"></div>
     <button class="prox" id="btnEnviar" onclick="enviarPedido()">PROSSEGUIR PARA PAGAMENTO</button>
 </div>
 
@@ -101,8 +103,9 @@ function abrirModal(){ document.getElementById('modalTamanho').style.display='fl
 function fecharModal(){ document.getElementById('modalTamanho').style.display='none'; }
 function fecharModalExterno(e){ if(e.target!==document.getElementById('imgModal')) fecharModal(); }
 
-async function enviarPedido(){
+async function enviarPedco() {
     const btn=document.getElementById('btnEnviar');
+    const statusMsg=document.getElementById('statusMsg');
     const whatsapp=document.getElementById('whatsappCliente').value.replace(/\D/g,'');
     const nomeCli=document.getElementById('nomeCliente').value.trim();
     const camisaNom=document.getElementById('nomeCamisa').value.trim();
@@ -114,20 +117,25 @@ async function enviarPedido(){
     }
 
     btn.disabled=true;
-    btn.innerText='Procurando partida...';
+    btn.innerText='Enviando dados...';
+    statusMsg.style.color='#ff9999';
+    statusMsg.innerText='Salvando pedido no servidor...';
 
-    localStorage.setItem('pedidoCamisa', JSON.stringify({identificacao:nomeCli, nomeCamisa:camisaNom, numero:camisaNum, tamanho:tamanho}));
+    // Salvamento local de backup
+    localStorage.setItem('pedCamisa', JSON.stringify({identificacao:nomeCli, nomeCamisa:camisaNom, numero:camisaNum, tamanho:tamanho}));
     localStorage.setItem('user_whatsapp', whatsapp);
 
-    // Payload ajustado para os nomes do seu Code.gs
+    // PAYLOAD ALINHADO AO CODE.GS DE FALLBACK
     const payload = {
         action: 'CREATE_ORDER',
         securityToken: 'TREM123',
-        whatsapp: whatsapp,    // data.whatsapp
-        nome: nomeCli,        // data.nome
+        whatsapp: whatsapp,
+        nome: nomeCli,
         camisaNome: camisaNom,
-        camisaNumero: camisaNum, // data.camisaNumero
-        tamanho: tamanho
+        camisaNumero: camisaNum,
+        tamanho: tamanho,
+        statusPedidos: "Aguardando Pagamento",
+        statusFinanceiro: "Pendente"
     };
 
     try {
@@ -138,12 +146,20 @@ async function enviarPedido(){
             body: JSON.stringify(payload)
         });
 
+        // Como mode:'no-cors' não permite ler a resposta de volta perfeitamente,
+        // assumimos que o pedido foi criado com sucesso se não houve reject (exception de rede).
+        statusMsg.style.color='#4CAF50';
+        statusMsg.innerText='Dados salvos com sucesso! Redirecionando...';
         btn.innerText='Partida encontrada!';
-        await new Promise(r=>setTimeout(r,800));
+        
+        await new Promise(r=>setTimeout(r,1000));
         window.location.href='pagamento.html';
+        
     } catch(e) {
         btn.disabled=false;
-        btn.innerText='Falha ao conectar ao servidor';
+        btn.innerText='PROSSEGUIR PARA PAGAMENTO';
+        statusMsg.style.color='#ff4444';
+        statusMsg.innerText='Falha de conexão. Verifique sua internet.';
     }
 }
 </script>

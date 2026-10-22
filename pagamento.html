@@ -8,7 +8,7 @@
 :root{--vermelho:#cc0000;--preto:#000;--cinza:#1a1a1a}
 body{font-family:Arial,sans-serif;background:#000;color:#fff;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
 .card{background:var(--cinza);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--vermelho);text-align:center}
-h2{color:var(--vermelho);font-family:'Impact';margin-bottom:5px}
+h2{color:var(--vermelho);font-family:'Impact',sans-serif;margin-bottom:8px}
 .resumo{text-align:left;background:#000;padding:15px;border-radius:8px;margin:15px 0;font-size:14px;line-height:1.6;border:1px solid #333}
 .pago{color:#25d366;font-weight:bold}
 .deve{color:var(--vermelho);font-weight:bold}
@@ -18,24 +18,29 @@ h2{color:var(--vermelho);font-family:'Impact';margin-bottom:5px}
 #areaPix{display:none;margin-top:20px;background:#fff;color:#000;padding:15px;border-radius:8px;word-break:break-all;font-size:11px}
 #codigoPix{display:block;margin:10px 0}
 .btn-whatsapp{background:#25d366;color:#fff;width:100%;border:none;padding:18px;border-radius:8px;font-weight:bold;margin-top:20px;display:none;cursor:pointer}
+.status{margin-top:12px;font-size:13px}
 </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 style="color:var(--vermelho);font-family:Impact">PAGAMENTO</h2>
-    <div id="resumoPedido" class="resumo">Carregando dados da planilha...</div>
+    <h2>PAGAMENTO</h2>
+
+    <div id="statusMsg" class="status">Procurando partida…</div>
+
+    <div id="resumoPedido" class="resumo"></div>
 
     <div id="botoesPagamento" style="display:none">
-        <button class="btn-pix btn-metade" onclick="gerarPix(37.70)">
-            <span>Pagar Metade (50%)</span><span>R$ 37,70</span>
+        <button class="btn-pix btn-metade" id="btnMetade" onclick="gerarPixMetade()">
+            <span>Pagar Metade (50%)</span><span id="labelMetade">R$ 0,00</span>
         </button>
-        <button class="btn-pix btn-total" onclick="gerarPixRestante()">
-            <span>Pagar Valor Restante</span><span id="labelRestante">R$ 75,40</span>
+
+        <button class="btn-pix btn-total" id="btnTotal" onclick="gerarPixRestante()">
+            <span>Pagar Valor Restante</span><span id="labelRestante">R$ 0,00</span>
         </button>
 
         <div id="areaPix">
-            <strong>Código PIX Copiado! ✅</strong><br>
+            <strong>Código PIX copiado! ✅</strong><br>
             <span id="codigoPix"></span>
         </div>
 
@@ -46,91 +51,126 @@ h2{color:var(--vermelho);font-family:'Impact';margin-bottom:5px}
 </div>
 
 <script>
-/* ---------- CONFIGURAÇÕES ---------- */
+/* -------------------------------------------------
+   CONFIGURAÇÕES
+------------------------------------------------- */
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
-let dadosPedido = null;   // será preenchido por `init()`
+let pedido = null;   // objeto vindo da planilha
 
-/* ---------- INICIALIZAÇÃO ---------- */
-async function init() {
-    const zap = localStorage.getItem('user_whatsapp');
-    const box = document.getElementById('resumoPedido');
+/* -------------------------------------------------
+   FUNÇÃO DE INICIALIZAÇÃO
+------------------------------------------------- */
+async function init(){
+    const statusEl = document.getElementById('statusMsg');
+    const resumoEl = document.getElementById('resumoPedido');
+    const btnBox   = document.getElementById('botoesPagamento');
 
-    if (!zap) {
-        box.innerText = 'WhatsApp não encontrado. Volte ao início.';
+    const whatsapp = localStorage.getItem('user_whatsapp');
+
+    if(!whatsapp){
+        statusEl.textContent = 'WhatsApp não encontrado. Volte ao início.';
+        statusEl.style.color = '#f00';
         return;
     }
 
-    try {
-        const resp = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'GET_ORDER', whatsapp: zap })
+    try{
+        const resp = await fetch(SCRIPT_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({action:'GET_ORDER', whatsapp})
         });
-        const result = await resp.json();
 
-        if (result.status === 'success') {
-            dadosPedido = result.data;
+        const data = await resp.json();
 
-            const falta = dadosPedido.valorTotal - dadosPedido.valorPago;
-
-            document.getElementById('resumoPedido').innerHTML = `
-                👤 <b>${dadosPedido.nome}</b><br>
-                👕 Camisa: ${dadosPedido.camisaNome.toUpperCase()} (Nº ${dadosPedido.camisaNumero})<br>
-                📏 Tamanho: ${dadosPedido.tamanho}<br><br>
-                💰 Total: R$ ${dadosPedido.valorTotal.toLocaleString('pt-BR')}<br>
-                <span class="pago">✅ Pago: R$ ${dadosPedido.valorPago.toLocaleString('pt-BR')}</span><br>
-                <span class="deve">🚨 Falta: R$ ${falta.toLocaleString('pt-BR')}</span>
-            `;
-
-            // Atualiza rótulos dos botões
-            document.getElementById('labelRestante').innerText = `R$ ${falta.toLocaleString('pt-BR')}`;
-            document.getElementById('labelMetade').innerText  = `R$ ${ (dadosPedido.valorTotal/2).toLocaleString('pt-BR') }`;
-
-            // Se já pagou tudo, desabilita a tela de pagamento
-            if (falta <= 0) {
-                document.getElementById('botoesPagamento').innerHTML = 
-                    '<p style="color:#25d366;font-weight:bold">PEDIDO TOTALMENTE PAGO! 🚀</p>';
-                return;
-            }
-
-            document.getElementById('botoesPagamento').style.display = 'block';
-        } else {
-            document.getElementById('resumoPedido').innerText = 'Pedido não encontrado.';
+        if(data.status!=='success'){
+            throw new Error('Pedido não encontrado');
         }
-    } catch (e) {
-        document.getElementById('resumoPedido').innerText = 'Erro ao conectar com o servidor.';
+
+        pedido = data.data; // já contém nome, camisaNome, etc.
+
+        const falta = (pedido.valorTotal - pedido.valorPago).toFixed(2);
+
+        // -------------------------------------------------
+        // Monta o resumo
+        // -------------------------------------------------
+        resumoEl.innerHTML = `
+            👤 <b>${pedido.nome}</b><br>
+            👕 Camisa: ${pedido.camisaNome.toUpperCase()} (Nº ${pedido.camisaNumero})<br>
+            📏 Tamanho: ${pedido.tamanho}<br><br>
+            💰 Total: R$ ${pedido.valorTotal.toLocaleString('pt-BR')}<br>
+            <span class="pago">✅ Pago: R$ ${pedido.valorPago.toLocaleString('pt-BR')}</span><br>
+            <span class="deve">🚨 Falta: R$ ${Number(falta).toLocaleString('pt-BR')}</span>
+        `;
+
+        // -------------------------------------------------
+        // Atualiza rótulos dos botões
+        // -------------------------------------------------
+        document.getElementById('labelMetade').innerText = 
+            `R$ ${(pedido.valorTotal/2).toLocaleString('pt-BR')}`;
+        document.getElementById('labelRestante').innerText = 
+            `R$ ${Number(falta).toLocaleString('pt-BR')}`;
+
+        // -------------------------------------------------
+        // Se já estiver tudo pago, desabilita a área de pagamento
+        // -------------------------------------------------
+        if(Number(falta) <= 0){
+            btnBox.innerHTML = `<p style="color:#25d366;font-weight:bold">PEDIDO TOTALMENTE PAGO! 🚀</p>`;
+            statusEl.textContent = 'Partida encontrada!';
+            statusEl.style.color = '#0f0';
+            return;
+        }
+
+        // Exibe os botões
+        btnBox.style.display = 'block';
+        statusEl.textContent = 'Partida encontrada!';
+        statusEl.style.color = '#0f0';
+    }catch(err){
+        console.error('Erro ao buscar pedido', err);
+        statusEl.textContent = 'Falha ao conectar ao servidor.';
+        statusEl.style.color = '#f00';
+        resumoEl.textContent = 'Não foi possível obter os dados do pedido.';
     }
 }
 
-/* ---------- GERAÇÃO DO CÓDIGO PIX ---------- */
-function gerarPix(valor) {
-    // Valor já formatado com vírgula (ex.: 37,70)
-    const valorFmt = valor.toString().replace('.', ',');
-    // Código estático do PIX (substitua se seu provedor usar outro padrão)
+/* -------------------------------------------------
+   GERAÇÃO DO CÓDIGO PIX
+------------------------------------------------- */
+function gerarPix(valor){
+    const valorFmt = Number(valor).toFixed(2).replace('.', ','); // 37,70 etc.
+    // Exemplo de payload estático – ajuste se usar QR Code ou outro padrão
     const pix = `00020126360014br.gov.bcb.pix0114+55${'31991595612'}${valorFmt}`;
-    navigator.clipboard.writeText(pix);
-    document.getElementById('codigoPix').innerText = pix;
-    document.getElementById('areaPix').style.display = 'block';
-    document.getElementById('btnWhatsapp').style.display = 'block';
+    navigator.clipboard.writeText(pix).then(()=>{
+        document.getElementById('codigoPix').innerText = pix;
+        document.getElementById('areaPix').style.display = 'block';
+        document.getElementById('btnWhatsapp').style.display = 'block';
+    });
 }
-
-/* Valor restante (quando já houver pagamento) */
-function gerarPixRestante() {
-    const falta = dadosPedido.valorTotal - dadosPedido.valorPago;
+function gerarPixMetade(){
+    gerarPix(pedido.valorTotal/2);
+}
+function gerarPixRestante(){
+    const falta = pedido.valorTotal - pedido.valorPago;
     gerarPix(falta);
 }
 
-/* ---------- FINALIZAR (WhatsApp) ---------- */
-function finalizar() {
+/* -------------------------------------------------
+   FINALIZAR – WhatsApp
+------------------------------------------------- */
+function finalizar(){
     const msg = `Olá! Já paguei a camisa do Trem do Ódio.
-Nome: ${dadosPedido.nome}
+Nome: ${pedido.nome}
 WhatsApp: ${localStorage.getItem('user_whatsapp')}
-Valor pago: R$ ${dadosPedido.valorPago.toLocaleString('pt-BR')}
-`;
-    window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(msg)}`;
+Valor pago: R$ ${pedido.valorPago.toLocaleString('pt-BR')}
+Camisa: ${pedido.camisaNome.toUpperCase()} Nº ${pedido.camisaNumero}
+Tamanho: ${pedido.tamanho}`;
+
+    const url = `https://wa.me/5531991595612?text=${encodeURIComponent(msg)}`;
+    window.location.href = url;
 }
 
-/* ---------- CARREGA INICIAL ---------- */
+/* -------------------------------------------------
+   INICIA
+------------------------------------------------- */
 init();
 </script>
 </body>

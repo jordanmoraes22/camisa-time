@@ -1,188 +1,93 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Personalize sua Camisa – Trem do Ódio EC</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-:root{--vermelho:#cc0000;--preto:#000;--cinza:#1a1a1a}
-body{font-family:Arial,sans-serif;background:#000;color:#fff;margin:0;padding:10px;display:flex;flex-direction:column;align-items:center}
-h1{color:var(--vermelho);font-size:18px;text-transform:uppercase;font-family:'Impact',sans-serif;margin:15px 0;text-align:center}
-.preview{display:flex;gap:10px;width:100%;max-width:500px}
-.box{position:relative;width:48%;background:var(--cinza);border-radius:8px;border:1px solid #333}
-.box img{width:100%;display:block;border-radius:8px}
-.legenda{font-size:10px;color:#888;margin:5px 0;text-align:center}
-.txt-nome{position:absolute;top:22%;left:50%;transform:translateX(-50%);width:58%;height:30px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#displayNome{font-family:'Impact',sans-serif;color:#fff;text-transform:uppercase;font-size:22px;white-space:nowrap;line-height:1}
-.txt-num{position:absolute;top:36%;left:50%;transform:translateX(-50%);font-family:'Impact',sans-serif;font-size:50px;color:#fff;text-shadow:2px 2px 4px rgba(0,0,0,.9)}
-.form{background:var(--cinza);padding:20px;border-radius:15px;width:95%;max-width:400px;margin-top:20px;border-top:4px solid var(--vermelho);box-sizing:border-box}
-label{display:block;margin:12px 0 5px;font-size:11px;color:#ff9999;font-weight:bold;text-transform:uppercase}
-input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;background:#000;color:#fff;font-size:14px;box-sizing:border-box}
-button.prox{width:100%;padding:15px;background:var(--vermelho);color:#fff;border:none;border-radius:5px;margin-top:20px;font-size:18px;font-weight:bold;text-transform:uppercase;cursor:pointer}
-button:disabled{background:#666;cursor:not-allowed}
-.status-msg{margin-top:12px;font-size:12px;color:#ff0}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Personalizar Camisa - Trem do Ódio</title>
+    <style>
+        :root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
+        body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:15px;display:flex;flex-direction:column;align-items:center}
+        .preview{display:flex;gap:10px;margin-bottom:20px;width:100%;max-width:400px}
+        .box{position:relative;width:50%;background:var(--gray);border-radius:8px;border:1px solid #333}
+        .box img{width:100%;display:block;border-radius:8px}
+        .txt-nome{position:absolute;top:22%;left:50%;transform:translateX(-50%);width:60%;text-align:center;font-family:'Impact',sans-serif;font-size:18px;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+        .txt-num{position:absolute;top:38%;left:50%;transform:translateX(-50%);font-family:'Impact',sans-serif;font-size:45px}
+        .form{background:var(--gray);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);box-sizing:border-box}
+        label{display:block;margin:10px 0 5px;font-size:12px;color:#888;text-transform:uppercase}
+        input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;background:#000;color:#fff;font-size:14px;box-sizing:border-box}
+        .btn{width:100%;padding:15px;background:var(--red);color:#fff;border:none;border-radius:5px;margin-top:20px;font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase}
+        .btn:disabled{background:#555}
+    </style>
 </head>
 <body>
 
-<h1>Personalize sua Camisa</h1>
-
 <div class="preview">
-    <div class="box"><p class="legenda">FRENTE</p><img src="Frente.png"></div>
+    <div class="box"><img src="Frente.png"></div>
     <div class="box">
-        <p class="legenda">COSTAS</p>
         <img src="Costas.png">
-        <div class="txt-nome"><span id="displayNome">SNOOP DOGG</span></div>
-        <div id="displayNumero" class="txt-num">99</div>
+        <div id="prevNome" class="txt-nome">SNOOP DOGG</div>
+        <div id="prevNum" class="txt-num">99</div>
     </div>
 </div>
 
 <div class="form">
-    <label>WhatsApp (DDD + Número)</label>
-    <input type="tel" id="whatsappCliente" placeholder="ex.: 31991595612" inputmode="numeric">
-
-    <label>Seu Nome (Identificação)</label>
-    <input type="text" id="nomeCliente" placeholder="ex.: Seu Nome">
+    <label>WhatsApp (com DDD)</label>
+    <input type="tel" id="whatsapp" placeholder="31991595612">
+    
+    <label>Seu Nome Completo</label>
+    <input type="text" id="nomeCli" placeholder="Ex: João Silva">
 
     <label>Nome na Camisa</label>
-    <input type="text" id="nomeCamisa" placeholder="ex.: Snoop Dogg" oninput="atualizar()">
+    <input type="text" id="camisaNom" placeholder="Ex: SNOOP" oninput="update()">
 
-    <label>Número (00‑99)</label>
-    <input type="number" id="numeroCamisa" placeholder="99" oninput="validarNumero()" inputmode="numeric">
+    <label>Número (00-99)</label>
+    <input type="number" id="camisaNum" placeholder="99" oninput="update()">
 
     <label>Tamanho</label>
-    <select id="tamanhoCamisa">
-        <option value="P">P</option><option value="M">M</option><option value="G" selected>G</option>
-        <option value="GG">GG</option><option value="XG">XG</option>
+    <select id="tamanho">
+        <option>P</option><option>M</option><option selected>G</option><option>GG</option><option>XG</option>
     </select>
 
-    <div id="statusMsg" class="status-msg"></div>
-    <button class="prox" id="btnEnviar" onclick="enviarPedido()">PROSSEGUIR PARA PAGAMENTO</button>
+    <button id="btn" class="btn" onclick="enviar()">Concluir Pedido</button>
 </div>
 
 <script>
-/* -------------------------------------------------
-   CONFIGURAÇÕES
-------------------------------------------------- */
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec";
 
-/* -------------------------------------------------
-   UI – preview da camisa
-------------------------------------------------- */
-function validarNumero(){
-    const el=document.getElementById('numeroCamisa');
-    if(el.value.length>2) el.value=el.value.slice(0,2);
-    atualizar();
-}
-function atualizar(){
-    const nome=document.getElementById('nomeCamisa').value;
-    const num=document.getElementById('numeroCamisa').value;
-    const dNome=document.getElementById('displayNome');
-    const dNum=document.getElementById('displayNumero');
-    const container=document.querySelector('.txt-nome');
-
-    dNum.innerText = num==='' ? "99" : num.padStart(2,'0');
-    dNome.innerText = (nome || "SNOOP DOGG").toUpperCase();
-
-    // ajuste de fonte para caber
-    let fs=22;
-    dNome.style.fontSize=fs+'px';
-    while(dNome.scrollWidth>container.offsetWidth && fs>8){
-        fs--; dNome.style.fontSize=fs+'px';
-    }
+function update(){
+    document.getElementById('prevNome').innerText = document.getElementById('camisaNom').value.toUpperCase() || "SNOOP DOGG";
+    let n = document.getElementById('camisaNum').value;
+    document.getElementById('prevNum').innerText = n ? n.toString().padStart(2,'0') : "99";
 }
 
-/* -------------------------------------------------
-   ENVIO DO PEDIDO
-------------------------------------------------- */
-async function enviarPedido(){
-    const status = document.getElementById('statusMsg');
-    const btn    = document.getElementById('btnEnviar');
-
-    const whatsapp = document.getElementById('whatsappCliente').value.replace(/\D/g,'');
-    const nomeCli = document.getElementById('nomeCliente').value.trim();
-    const camisaNom = document.getElementById('nomeCamisa').value.trim();
-    const camisaNum = document.getElementById('numeroCamisa').value.trim();
-    const tamanho   = document.getElementById('tamanhoCamisa').value;
-
-    if(!whatsapp || !nomeCli || !camisaNom || !camisaNum){
-        alert('Preencha todos os campos!');
-        return;
-    }
-
-    // -------------------------------------------------
-    // 1️⃣ Mostra “Procurando partida…”
-    // -------------------------------------------------
-    btn.disabled = true;
-    btn.innerText = 'Procurando partida…';
-    status.innerText = '';
-
-    // -------------------------------------------------
-    // 2️⃣ Verifica se já existe pedido para esse WhatsApp
-    // -------------------------------------------------
-    try{
-        const resp = await fetch(SCRIPT_URL,{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({action:'GET_ORDER', whatsapp})
-        });
-        const data = await resp.json();
-
-        if(data.status==='success'){
-            // Já tem registro → nada a criar, só avançar
-            localStorage.setItem('user_whatsapp', whatsapp);
-            btn.innerText = 'Partida encontrada!';
-            setTimeout(()=>window.location.href='pagamento.html',700);
-            return;
-        }
-    }catch(e){
-        console.error('GET_ORDER falhou',e);
-        // continua para criar (pode ser “pedido ainda não existe”)
-    }
-
-    // -------------------------------------------------
-    // 3️⃣ Cria novo pedido
-    // -------------------------------------------------
+async function enviar(){
+    const btn = document.getElementById('btn');
     const payload = {
         action: 'CREATE_ORDER',
-        whatsapp,
-        nome: nomeCli,
-        camisaNome: camisaNom,
-        camisaNumero: camisaNum,
-        tamanho
+        whatsapp: document.getElementById('whatsapp').value.replace(/\D/g,''),
+        nome: document.getElementById('nomeCli').value,
+        camisaNome: document.getElementById('camisaNom').value,
+        camisaNumero: document.getElementById('camisaNum').value,
+        tamanho: document.getElementById('tamanho').value
     };
 
-    try{
-        await fetch(SCRIPT_URL,{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify(payload)
-        });
+    if(!payload.whatsapp || !payload.nome){ alert("Preencha os dados!"); return; }
 
-        // -------------------------------------------------
-        // 4️⃣ Salva no localStorage (usado na tela de pagamento)
-        // -------------------------------------------------
-        localStorage.setItem('user_whatsapp', whatsapp);
-        localStorage.setItem('pedCamisa', JSON.stringify({
-            identificacao: nomeCli,
-            nomeCamisa: camisaNom,
-            numero: camisaNum,
-            tamanho
-        }));
+    btn.disabled = true;
+    btn.innerText = "Procurando partida de liga...";
 
-        // -------------------------------------------------
-        // 5️⃣ UI de sucesso + redirecionamento
-        // -------------------------------------------------
-        btn.innerText = 'Partida encontrada!';
-        status.style.color = '#0f0';
-        status.innerText = 'Pedido registrado com sucesso.';
-        setTimeout(()=>window.location.href='pagamento.html',700);
-    }catch(e){
-        console.error('CREATE_ORDER falhou',e);
+    try {
+        const resp = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const res = await resp.json();
+        if(res.status === 'success'){
+            btn.innerText = "PARTIDA ENCONTRADA!";
+            btn.style.background = "#25d366";
+            localStorage.setItem('user_whatsapp', payload.whatsapp);
+            setTimeout(() => window.location.href = 'pagamento.html', 1200);
+        }
+    } catch (e) {
         btn.disabled = false;
-        btn.innerText = 'PROSSEGUIR PARA PAGAMENTO';
-        status.style.color = '#f00';
-        status.innerText = 'Falha ao conectar ao servidor. Tente novamente.';
+        btn.innerText = "FALHA AO CONECTAR";
     }
 }
 </script>

@@ -7,92 +7,61 @@
     <style>
         :root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
         body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
-        .card{background:var(--gray);padding:25px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);text-align:center;box-sizing:border-box}
+        .card{background:var(--gray);padding:25px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);text-align:center}
         h2{font-family:'Impact';color:var(--red);margin:0 0 15px}
         .resumo{text-align:left;background:#000;padding:15px;border-radius:8px;font-size:14px;line-height:1.6;margin-bottom:20px;border:1px solid #333}
         .btn-pix{width:100%;padding:15px;margin:8px 0;border:none;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;justify-content:space-between;background:#333;color:#fff}
         .btn-total{background:var(--red)}
         .btn-zap{background:#25d366;width:100%;padding:15px;border:none;border-radius:8px;color:#fff;font-weight:bold;margin-top:15px;cursor:pointer;display:none}
-        #areaPix{display:none;background:#fff;color:#000;padding:10px;margin-top:10px;font-size:11px;border-radius:5px;word-break:break-all}
+        #areaPix{display:none;background:#fff;color:#000;padding:10px;margin-top:10px;font-size:10px;border-radius:5px;word-break:break-all}
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 id="statusTitle">BUSCANDO PARTIDA...</h2>
+    <h2 id="status">BUSCANDO PARTIDA...</h2>
     <div id="resumo" class="resumo">Carregando dados da planilha...</div>
 
-    <div id="controls" style="display:none">
-        <button class="btn-pix" onclick="copiarPix(37.70)">
-            <span>PAGAR METADE (50%)</span><span>R$ 37,70</span>
-        </button>
-        <button class="btn-pix btn-total" onclick="copiarPixRestante()">
-            <span>PAGAR RESTANTE</span><span id="labelRestante">R$ 75,40</span>
-        </button>
-
-        <div id="areaPix">
-            <b>CÓDIGO PIX COPIADO! ✅</b><br>
-            <span id="pixCode"></span>
-        </div>
-
-        <button id="btnZap" class="btn-zap" onclick="finalizarZap()">✅ JÁ PAGUEI! AVISAR WHATSAPP</button>
+    <div id="boxPay" style="display:none">
+        <button class="btn-pix" onclick="copyPix(37.70)"><span>PAGAR METADE (50%)</span><span>R$ 37,70</span></button>
+        <button class="btn-pix btn-total" onclick="copyPixRestante()"><span>PAGAR RESTANTE</span><span id="txtFalta">R$ 75,40</span></button>
+        <div id="areaPix"><b>PIX COPIADO! ✅</b><br><span id="code"></span></div>
+        <button id="btnZap" class="btn-zap" onclick="goZap()">✅ JÁ PAGUEI! AVISAR NO WHATSAPP</button>
     </div>
 </div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec";
-let dadosPedido = null;
+let d = null;
 
 async function init(){
     const zap = localStorage.getItem('user_whatsapp');
-    if(!zap){ document.getElementById('resumo').innerText="Erro: WhatsApp não encontrado."; return; }
-
     try {
-        const resp = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({action:'GET_ORDER', whatsapp: zap}) });
-        const res = await resp.json();
-
-        if(res.status === 'success'){
-            dadosPedido = res.data;
-            const d = res.data;
-            const falta = d.valorTotal - d.valorPago;
-
-            document.getElementById('statusTitle').innerText = "PARTIDA ENCONTRADA!";
-            document.getElementById('resumo').innerHTML = `
-                👤 <b>${d.nome}</b><br>
-                👕 ${d.camisaNome} (${d.camisaNumero}) - Tam: ${d.tamanho}<br><br>
-                💰 Total: R$ ${d.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}<br>
-                <span style="color:#25d366">✅ Pago: R$ ${d.valorPago.toLocaleString('pt-BR', {minimumFractionDigits:2})}</span><br>
-                <span style="color:#ff0000">🚨 Falta: R$ ${falta.toLocaleString('pt-BR', {minimumFractionDigits:2})}</span>
-            `;
-            
-            document.getElementById('labelRestante').innerText = `R$ ${falta.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('controls').style.display = 'block';
-        } else {
-            document.getElementById('resumo').innerText = "Pedido ainda não processado. Aguarde ou tente novamente.";
+        const r = await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({action:'GET_ORDER', whatsapp: zap})});
+        const res = await r.json();
+        if(res.status==='success'){
+            d = res.data;
+            document.getElementById('status').innerText = "PARTIDA ENCONTRADA!";
+            document.getElementById('resumo').innerHTML = `👤 <b>${d.nome}</b><br>👕 ${d.camisaNome} (${d.camisaNumero})<br>💰 Total: R$ 75,40<br><span style="color:#25d366">✅ Pago: R$ ${d.valorPago.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>`;
+            document.getElementById('boxPay').style.display = 'block';
+            document.getElementById('txtFalta').innerText = `R$ ${(75.4 - d.valorPago).toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
         }
-    } catch (e) {
-        document.getElementById('resumo').innerText = "Erro ao carregar dados.";
-    }
+    } catch(e) { document.getElementById('resumo').innerText = "Erro ao carregar ou pedido novo. Tente pagar usando os botões abaixo."; document.getElementById('boxPay').style.display = 'block'; }
 }
 
-function copiarPix(valor){
-    const vFmt = valor.toFixed(2).replace('.', ',');
-    const pix = `00020126360014br.gov.bcb.pix0114+5531991595612${vFmt}`;
+function copyPix(val){
+    const pix = `00020126360014br.gov.bcb.pix0114+5531991595612${val.toFixed(2).replace('.',',')}`;
     navigator.clipboard.writeText(pix);
-    document.getElementById('pixCode').innerText = pix;
+    document.getElementById('code').innerText = pix;
     document.getElementById('areaPix').style.display = 'block';
     document.getElementById('btnZap').style.display = 'block';
 }
 
-function copiarPixRestante(){
-    copiarPix(dadosPedido.valorTotal - dadosPedido.valorPago);
-}
+function copyPixRestante(){ copyPix(d ? (75.4 - d.valorPago) : 75.4); }
 
-function finalizarZap(){
-    const msg = encodeURIComponent(`Fiz o pagamento da minha camisa do Trem do Ódio!\nNome: ${dadosPedido.nome}`);
-    window.location.href = `https://wa.me/5531991595612?text=${msg}`;
+function goZap(){
+    window.location.href = `https://wa.me/5531991595612?text=Paguei minha camisa! Nome: ${d?d.nome:'Novo Pedido'}`;
 }
-
 init();
 </script>
 </body>

@@ -12,7 +12,7 @@
         }
 
         body { 
-            font-family: 'Arial Black', 'Arial', sans-serif; 
+            font-family: 'Arial', sans-serif; 
             background-color: var(--preto); 
             color: white; 
             margin: 0; 
@@ -24,14 +24,15 @@
 
         h1 { 
             color: var(--vermelho); 
-            font-size: 20px; 
+            font-size: 18px; 
             text-transform: uppercase; 
             margin: 15px 0;
             text-align: center;
             line-height: 1.2;
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 1px;
         }
         
-        /* Layout das Camisas */
         .preview-container {
             display: flex;
             flex-direction: row;
@@ -51,38 +52,38 @@
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* NOME NA CAMISA - Lógica de proporção */
+        /* AREA DO NOME */
         .txt-nome-container {
             position: absolute;
-            top: 22%; 
+            top: 21%; /* Posição ajustada */
             left: 50%;
             transform: translateX(-50%);
-            width: 70%; /* Limite para o nome não encostar nas mangas */
-            height: 30px;
+            width: 80%; /* Aumentei a área útil */
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            overflow: visible;
         }
 
         #displayNome {
-            font-size: 16px; /* Tamanho base */
-            font-weight: 900;
+            font-family: 'Impact', sans-serif; /* Fonte de peso de camisa */
+            font-size: 20px; /* Tamanho inicial maior */
             color: #ffffff;
             text-transform: uppercase;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
             white-space: nowrap;
-            transition: font-size 0.1s;
+            display: inline-block;
+            transition: 0.1s;
         }
 
         .txt-numero {
             position: absolute;
-            top: 35%;
+            top: 34%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 45px; 
-            font-weight: 900;
+            font-family: 'Impact', sans-serif;
+            font-size: 55px; /* Número maior e mais imponente */
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
             pointer-events: none;
@@ -130,7 +131,7 @@
             text-transform: uppercase;
         }
 
-        .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
+        .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; font-family: sans-serif; }
 
     </style>
 </head>
@@ -148,7 +149,7 @@
             <p class="legenda">COSTAS</p>
             <img src="Costas.png" class="camisa-img">
             <div class="txt-nome-container">
-                <span id="displayNome">NOME</span>
+                <span id="displayNome">JORDAN</span>
             </div>
             <div id="displayNumero" class="txt-numero">00</div>
         </div>
@@ -159,7 +160,7 @@
         <input type="text" id="nomePessoa" placeholder="Para identificação">
         
         <label>Nome na Camisa</label>
-        <input type="text" id="nomeCamisa" placeholder="Ex: MATHEUS PERRECA" oninput="atualizar()">
+        <input type="text" id="nomeCamisa" placeholder="Ex: MICHAEL JORDAN" oninput="atualizar()">
         
         <label>Número (00-99)</label>
         <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
@@ -190,24 +191,35 @@
             const displayNumero = document.getElementById('displayNumero');
             const container = document.querySelector('.txt-nome-container');
 
-            // 1. Atualiza o Número (sempre com 2 dígitos)
-            if(numInput === "") {
-                displayNumero.innerText = "00";
-            } else {
-                displayNumero.innerText = numInput.toString().padStart(2, '0');
-            }
+            // 1. Atualiza o Número
+            displayNumero.innerText = numInput === "" ? "00" : numInput.toString().padStart(2, '0');
 
             // 2. Atualiza o Nome
-            displayNome.innerText = nomeInput.toUpperCase() || "NOME";
+            displayNome.innerText = nomeInput.toUpperCase() || "JORDAN";
 
-            // 3. Lógica de Redimensionamento Proporcional
-            let fontSize = 16; // Tamanho máximo da fonte
-            displayNome.style.fontSize = fontSize + "px";
+            // 3. Lógica de Redimensionamento Realista (Jersey Style)
+            // Resetamos para o padrão
+            displayNome.style.fontSize = "20px";
+            displayNome.style.transform = "scaleX(1)";
 
-            // Enquanto o nome for mais largo que o container, diminui a fonte
-            while (displayNome.offsetWidth > container.offsetWidth && fontSize > 6) {
-                fontSize -= 0.5;
-                displayNome.style.fontSize = fontSize + "px";
+            let containerWidth = container.offsetWidth;
+            let textWidth = displayNome.offsetWidth;
+
+            if (textWidth > containerWidth) {
+                // Primeiro, tentamos diminuir a fonte um pouco (até 14px)
+                let newSize = 20;
+                while (displayNome.offsetWidth > containerWidth && newSize > 14) {
+                    newSize -= 1;
+                    displayNome.style.fontSize = newSize + "px";
+                }
+
+                // Se ainda assim não couber, nós "achatamos" o nome (compressão horizontal)
+                let finalWidth = displayNome.offsetWidth;
+                if (finalWidth > containerWidth) {
+                    let ratio = containerWidth / finalWidth;
+                    displayNome.style.transform = `scaleX(${ratio})`;
+                    displayNome.style.transformOrigin = "center";
+                }
             }
         }
 

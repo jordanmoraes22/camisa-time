@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trem do Ódio EC - Oficial</title>
+    <style>
+        :root { --vermelho: #cc0000; --preto: #000000; --cinza: #1a1a1a; }
+        body { font-family: 'Impact', sans-serif; background: var(--preto); color: white; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 20px; }
+        .logo { max-width: 220px; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(204, 0, 0, 0.4)); }
+        .btn-main { width: 100%; max-width: 300px; padding: 20px; margin: 10px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 18px; transition: 0.3s; text-decoration: none; display: inline-block; }
+        .btn-pedido { background: var(--vermelho); color: white; }
+        .btn-restante { background: #333; color: white; border: 1px solid #555; }
+        .prazo-info { margin-top: 30px; font-family: 'Arial', sans-serif; font-size: 14px; color: #888; border-top: 1px solid #333; padding-top: 20px; line-height: 1.6; }
+        .dias-counter { color: var(--vermelho); font-weight: bold; font-size: 22px; display: block; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <img src="Logo.png" alt="Trem do Ódio EC" class="logo">
+    <a href="pedido.html" class="btn-main btn-pedido">Quero pedir minha camisa</a>
+    <a href="pagamento.html?fluxo=restante" class="btn-main btn-restante">Pagar valor restante</a>
+
+    <div class="prazo-info">
+        Previsão para entrega (após pedido ao fornecedor):
+        <span class="dias-counter">Faltam 30 dias</span>
+        <small>Confecção em 30 dias corridos</small>
+    </div>
+</body>
+</html>

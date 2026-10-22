@@ -2,86 +2,101 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Pagamento</title>
+<title>Pagamento - Trem do Ódio</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
     :root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
-    body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
-    .card{background:var(--gray);padding:25px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);text-align:center}
-    h2{font-family:'Impact';color:var(--red);margin:0 0 15px;text-transform:uppercase}
-    .resumo{text-align:left;background:#000;padding:15px;border-radius:8px;font-size:14px;line-height:1.6;margin-bottom:20px}
-    .btn-pix{width:100%;padding:15px;margin:8px 0;border:none;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;justify-content:space-between;background:#333;color:#fff;font-size:13px}
-    .btn-total{background:var(--red)}
-    .btn-zap{background:#25d366;color:#fff;width:100%;padding:18px;border:none;border-radius:8px;font-weight:bold;margin-top:15px;cursor:pointer;display:none}
-    #areaPix{display:none;background:#fff;color:#000;padding:12px;margin-top:10px;font-size:10px;border-radius:5px;word-break:break-all}
+    body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:15px;display:flex;flex-direction:column;align-items:center}
+    .logo{width:120px;margin-bottom:10px}
+    h2{font-family:'Impact';color:var(--red);text-transform:uppercase;margin-bottom:20px}
+    #containerPedidos{width:100%;max-width:400px}
+    .card{background:var(--gray);padding:20px;border-radius:12px;border-top:4px solid var(--red);margin-bottom:20px}
+    .resumo{text-align:left;background:#000;padding:12px;border-radius:8px;font-size:14px;line-height:1.5;margin-bottom:15px}
+    .btn{width:100%;padding:14px;margin:5px 0;border:none;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;justify-content:space-between;font-size:12px}
+    .btn-pix{background:#333;color:#fff}
+    .btn-total{background:var(--red);color:#fff}
+    .btn-zap{background:#25d366;color:#fff;margin-top:10px;justify-content:center}
+    .pix-box{display:none;background:#fff;color:#000;padding:10px;font-size:10px;border-radius:5px;word-break:break-all;margin-top:10px}
 </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 id="status">BUSCANDO DADOS...</h2>
-    <div id="resumo" class="resumo">Aguarde, estamos localizando seu pedido na planilha...</div>
+<img src="Logo.png" class="logo">
+<h2 id="mainStatus">BUSCANDO PEDIDOS...</h2>
 
-    <div id="blocoPag" style="display:none">
-        <button class="btn-pix" onclick="copy(37.70)"><span>PAGAR METADE (50%)</span><span>R$ 37,70</span></button>
-        <button class="btn-pix btn-total" onclick="copyRestante()"><span>PAGAR VALOR RESTANTE</span><span id="vFalta">R$ 75,40</span></button>
-        <div id="areaPix"><b>CÓDIGO PIX COPIADO! ✅</b><br><br><span id="pixCode"></span></div>
-        <button id="btnZap" class="btn-zap" onclick="enviarWhats()">✅ JÁ PAGUEI! INFORMAR PAGAMENTO</button>
-    </div>
-</div>
+<div id="containerPedidos"></div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyb8QC2CaDZXGdSrHUNTbsdwlxrNUVoUVLV8bNUTMnSXTuF-qvGG2uwMqCkZgs4dYiemg/exec";
-let d = null;
 
-async function buscar(){
+// SUAS CHAVES PIX EXATAS
+const PIX_3770 = "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C";
+const PIX_7540 = "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4";
+
+async function carregarPedidos(){
     const zap = localStorage.getItem('user_whatsapp');
-    if(!zap){ document.getElementById('resumo').innerText = "Erro: WhatsApp não identificado."; return; }
+    if(!zap){ document.getElementById('mainStatus').innerText = "ERRO: WHATSAPP NÃO IDENTIFICADO"; return; }
 
     try {
-        const r = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({action: "GET_ORDER", whatsapp: zap})
-        });
+        const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({action: "GET_ORDER", whatsapp: zap}) });
         const res = await r.json();
 
-        if(res.status === 'success'){
-            d = res.data;
-            const falta = 75.4 - d.valorPago;
-            document.getElementById('status').innerText = "PARTIDA ENCONTRADA!";
-            document.getElementById('resumo').innerHTML = `
-                👤 <b>${d.nome}</b><br>
-                👕 Camisa: ${d.camisaNome.toUpperCase()} (${d.camisaNumero})<br>
-                📏 Tamanho: ${d.tamanho}<br><br>
-                💰 Total: R$ 75,40<br>
-                <span style="color:#25d366">✅ Pago: R$ ${d.valorPago.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span><br>
-                <span style="color:#ff3333">🚨 Falta: R$ ${falta.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
-            `;
-            document.getElementById('blocoPag').style.display = 'block';
-            document.getElementById('vFalta').innerText = `R$ ${falta.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+        if(res.status === 'success' && res.data.length > 0){
+            document.getElementById('mainStatus').innerText = "PEDIDOS ENCONTRADOS";
+            const container = document.getElementById('containerPedidos');
+            container.innerHTML = ""; // limpa
+
+            res.data.forEach((p, index) => {
+                const falta = 75.4 - p.valorPago;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="resumo">
+                        <b>PEDIDO #${index + 1} - ${p.nome}</b><br>
+                        👕 Camisa: ${p.camisaNome.toUpperCase()} (${p.camisaNumero})<br>
+                        📏 Tamanho: ${p.tamanho}<br>
+                        💰 Total: R$ 75,40 | <span style="color:#25d366">Pago: R$ ${p.valorPago.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+                    </div>
+                    
+                    ${falta > 0 ? `
+                        <button class="btn btn-pix" onclick="copiarPix('${PIX_3770}', ${index})">
+                            <span>PAGAR METADE (50%)</span><span>R$ 37,70</span>
+                        </button>
+                        <button class="btn btn-total" onclick="copiarPix('${falta <= 37.7 ? PIX_3770 : PIX_7540}', ${index})">
+                            <span>PAGAR RESTANTE</span><span>R$ ${falta.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+                        </button>
+                    ` : '<div style="color:#25d366; font-weight:bold; margin:10px 0">PEDIDO TOTALMENTE PAGO! ✅</div>'}
+
+                    <div id="pixBox-${index}" class="pix-box"><b>PIX COPIADO! ✅</b><br><br><span></span></div>
+
+                    <button class="btn btn-zap" onclick="informar('${p.nome}', '${p.camisaNumero}', '${p.tamanho}', '${p.camisaNome}')">
+                        ✅ INFORMAR PAGAMENTO
+                    </button>
+                `;
+                container.appendChild(card);
+            });
         } else {
-            document.getElementById('resumo').innerText = "Pedido não encontrado. Se você acabou de pedir, aguarde 30 segundos e atualize a página.";
+            document.getElementById('mainStatus').innerText = "NENHUM PEDIDO ENCONTRADO";
         }
-    } catch(e) { document.getElementById('resumo').innerText = "Erro ao carregar dados. Tente atualizar."; }
+    } catch(e) { document.getElementById('mainStatus').innerText = "ERRO AO CARREGAR"; }
 }
 
-function copy(v){
-    const pix = `00020126360014br.gov.bcb.pix0114+55319915956120215${v.toFixed(2).replace('.',',')}`;
-    navigator.clipboard.writeText(pix);
-    document.getElementById('pixCode').innerText = pix;
-    document.getElementById('areaPix').style.display = 'block';
-    document.getElementById('btnZap').style.display = 'block';
+function copiarPix(codigo, idx){
+    navigator.clipboard.writeText(codigo);
+    const box = document.getElementById(`pixBox-${idx}`);
+    box.querySelector('span').innerText = codigo;
+    box.style.display = 'block';
 }
-function copyRestante(){ copy(d ? (75.4 - d.valorPago) : 75.4); }
 
-function enviarWhats(){
+function informar(nome, num, tam, cNome){
     const texto = `Fala bonitão,
 Paguei a camisa no site, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.
 
-Pedido: ${d.nome} - Nº ${d.camisaNumero} - Tam ${d.tamanho} - Nome na camisa: ${d.camisaNome}`;
+Pedido: ${nome} - Nº ${num} - Tam ${tam} - Nome na camisa: ${cNome}`;
     window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(texto)}`;
 }
-buscar();
+
+carregarPedidos();
 </script>
 </body>
 </html>

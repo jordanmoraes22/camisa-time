@@ -69,7 +69,6 @@ button:disabled{background:#666;opacity:.7;cursor:not-allowed}
     <button class="prox" id="btnEnviar" onclick="enviarPedido()">PROSSEGUIR PARA PAGAMENTO</button>
 </div>
 
-<!-- Modal Tamanho -->
 <div id="modalTamanho" class="modal" onclick="fecharModalExterno(event)">
     <span class="modal-close" onclick="fecharModal()">&times;</span>
     <img src="Tamanho.png" class="modal-content" id="imgModal">
@@ -78,7 +77,6 @@ button:disabled{background:#666;opacity:.7;cursor:not-allowed}
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
 
-/* ===== PREVIEW (seu código original) ===== */
 function validarNumero(){
     const c=document.getElementById('numeroCamisa');
     if(c.value.length>2) c.value=c.value.slice(0,2);
@@ -90,10 +88,8 @@ function atualizar(){
     const dNome=document.getElementById('displayNome');
     const dNum=document.getElementById('displayNumero');
     const container=document.querySelector('.txt-nome');
-
     dNum.innerText = num==="" ? "99" : num.toString().padStart(2,'0');
     dNome.innerText = (nome || "SNOOP DOGG").toUpperCase();
-
     let fs=22;
     dNome.style.fontSize=fs+'px';
     while(dNome.scrollWidth > container.offsetWidth && fs>8){
@@ -101,15 +97,10 @@ function atualizar(){
     }
 }
 
-/* ===== MODAL TAMANHO ===== */
 function abrirModal(){ document.getElementById('modalTamanho').style.display='flex'; }
 function fecharModal(){ document.getElementById('modalTamanho').style.display='none'; }
-function fecharModalExterno(e){
-    const img=document.getElementById('imgModal');
-    if(e.target!==img) fecharModal();
-}
+function fecharModalExterno(e){ if(e.target!==document.getElementById('imgModal')) fecharModal(); }
 
-/* ===== ENVIO PARA APPS SCRIPT ===== */
 async function enviarPedido(){
     const btn=document.getElementById('btnEnviar');
     const whatsapp=document.getElementById('whatsappCliente').value.replace(/\D/g,'');
@@ -125,32 +116,34 @@ async function enviarPedido(){
     btn.disabled=true;
     btn.innerText='Procurando partida...';
 
-    // Salva localmente para a tela de pagamento
-    const pedidoLocal={identificacao:nomeCli, nomeCamisa:camisaNom, numero:camisaNum, tamanho:tamanho};
-    localStorage.setItem('pedidoCamisa', JSON.stringify(pedidoLocal));
+    localStorage.setItem('pedidoCamisa', JSON.stringify({identificacao:nomeCli, nomeCamisa:camisaNom, numero:camisaNum, tamanho:tamanho}));
     localStorage.setItem('user_whatsapp', whatsapp);
 
-    const formData=new URLSearchParams();
-    formData.append('action','CREATE_ORDER');
-    formData.append('securityToken','TREM123');
-    formData.append('telefone',whatsapp);
-    formData.append('nomeCliente',nomeCli);
-    formData.append('camisaNome',camisaNom);
-    formData.append('camisaNum',camisaNum);
-    formData.append('tamanho',tamanho);
-    formData.append('operationId','op_'+Date.now()); // idempotência
+    // Payload ajustado para os nomes do seu Code.gs
+    const payload = {
+        action: 'CREATE_ORDER',
+        securityToken: 'TREM123',
+        whatsapp: whatsapp,    // data.whatsapp
+        nome: nomeCli,        // data.nome
+        camisaNome: camisaNom,
+        camisaNumero: camisaNum, // data.camisaNumero
+        tamanho: tamanho
+    };
 
-    try{
-        await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:formData});
-        // Sucesso visual
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
         btn.innerText='Partida encontrada!';
         await new Promise(r=>setTimeout(r,800));
         window.location.href='pagamento.html';
-    }catch(e){
-        console.error(e);
+    } catch(e) {
         btn.disabled=false;
         btn.innerText='Falha ao conectar ao servidor';
-        setTimeout(()=>{ btn.innerText='PROSSEGUIR PARA PAGAMENTO'; },3000);
     }
 }
 </script>

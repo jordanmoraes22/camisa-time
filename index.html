@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camisa Pro Clubs - Red & Black</title>
+    <title>Trem do Ódio EC - Camisas</title>
     <style>
         :root {
             --vermelho: #cc0000;
@@ -12,7 +12,7 @@
         }
 
         body { 
-            font-family: 'Arial Black', sans-serif; 
+            font-family: 'Arial Black', 'Arial', sans-serif; 
             background-color: var(--preto); 
             color: white; 
             margin: 0; 
@@ -24,16 +24,17 @@
 
         h1 { 
             color: var(--vermelho); 
-            font-size: 22px; 
+            font-size: 20px; 
             text-transform: uppercase; 
             margin: 15px 0;
-            text-shadow: 2px 2px 0px #440000;
+            text-align: center;
+            line-height: 1.2;
         }
         
         /* Layout das Camisas */
         .preview-container {
             display: flex;
-            flex-direction: row; /* Lado a lado no desktop */
+            flex-direction: row;
             gap: 10px;
             justify-content: center;
             width: 100%;
@@ -42,7 +43,7 @@
 
         .camisa-box { 
             position: relative; 
-            width: 48%; /* Ajusta para caber duas na linha */
+            width: 48%; 
             background-color: var(--cinza); 
             border-radius: 8px;
             border: 1px solid #333;
@@ -50,28 +51,29 @@
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* Ajuste do Nome Automático */
+        /* NOME NA CAMISA - Lógica de proporção */
         .txt-nome-container {
             position: absolute;
             top: 22%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 75%; /* Limite lateral para o nome */
+            width: 70%; /* Limite para o nome não encostar nas mangas */
             height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none;
+            text-align: center;
+            overflow: visible;
         }
 
         #displayNome {
-            font-size: 14px; /* Tamanho inicial */
+            font-size: 16px; /* Tamanho base */
             font-weight: 900;
             color: #ffffff;
             text-transform: uppercase;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
             white-space: nowrap;
-            display: inline-block;
+            transition: font-size 0.1s;
         }
 
         .txt-numero {
@@ -79,14 +81,14 @@
             top: 35%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 45px; /* Tamanho ajustado para celular */
+            font-size: 45px; 
             font-weight: 900;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
             pointer-events: none;
         }
 
-        /* Formulário Estilizado */
+        /* Formulário */
         .form-area { 
             background: var(--cinza); 
             padding: 20px; 
@@ -95,9 +97,10 @@
             max-width: 400px; 
             margin-top: 20px;
             border-top: 4px solid var(--vermelho);
+            box-sizing: border-box;
         }
         
-        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 12px; color: #ff9999; font-weight: bold; }
+        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 12px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
         
         input, select { 
             width: 100%; 
@@ -129,46 +132,39 @@
 
         .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
 
-        /* Media Query para telas muito pequenas */
-        @media (max-width: 360px) {
-            .txt-numero { font-size: 35px; }
-            #displayNome { font-size: 12px; }
-        }
     </style>
 </head>
 <body>
 
-    <h1>Personalize seu Manto</h1>
+    <h1>Sua camisa do Trem do Ódio EC</h1>
 
     <div class="preview-container">
-        <!-- Frente -->
         <div class="camisa-box">
             <p class="legenda">FRENTE</p>
             <img src="Frente.png" class="camisa-img">
         </div>
 
-        <!-- Costas -->
         <div class="camisa-box">
             <p class="legenda">COSTAS</p>
             <img src="Costas.png" class="camisa-img">
             <div class="txt-nome-container">
-                <span id="displayNome">SEU NOME</span>
+                <span id="displayNome">NOME</span>
             </div>
             <div id="displayNumero" class="txt-numero">00</div>
         </div>
     </div>
 
     <div class="form-area">
-        <label>NOME COMPLETO DO JOGADOR</label>
-        <input type="text" id="nomePessoa" placeholder="Nome para a lista">
+        <label>Seu Nome</label>
+        <input type="text" id="nomePessoa" placeholder="Para identificação">
         
-        <label>NOME NA CAMISA</label>
-        <input type="text" id="nomeCamisa" placeholder="Ex: XxxTentencion" oninput="atualizar()">
+        <label>Nome na Camisa</label>
+        <input type="text" id="nomeCamisa" placeholder="Ex: MATHEUS PERRECA" oninput="atualizar()">
         
-        <label>NÚMERO (00-99)</label>
+        <label>Número (00-99)</label>
         <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
         
-        <label>OPÇÃO DE PAGAMENTO</label>
+        <label>Opção de Pagamento</label>
         <select id="pagamento">
             <option value="50">PAGAR METADE (R$ 50,00)</option>
             <option value="100">PAGAR TOTAL (R$ 100,00)</option>
@@ -180,7 +176,6 @@
     <script>
         function validarNumero() {
             let campo = document.getElementById('numeroCamisa');
-            // Impede mais de 2 dígitos
             if (campo.value.length > 2) {
                 campo.value = campo.value.slice(0, 2);
             }
@@ -193,22 +188,26 @@
             
             const displayNome = document.getElementById('displayNome');
             const displayNumero = document.getElementById('displayNumero');
+            const container = document.querySelector('.txt-nome-container');
 
-            // Atualiza o Número
-            displayNumero.innerText = numInput.padStart(2, '0').slice(-2);
-
-            // Atualiza o Nome
-            displayNome.innerText = nomeInput.toUpperCase() || "SEU NOME";
-
-            // Lógica de Escala (Achatamento do nome)
-            let containerWidth = document.querySelector('.txt-nome-container').offsetWidth;
-            let currentWidth = displayNome.offsetWidth;
-            
-            if (currentWidth > containerWidth) {
-                let escala = containerWidth / currentWidth;
-                displayNome.style.transform = `scaleX(${escala})`;
+            // 1. Atualiza o Número (sempre com 2 dígitos)
+            if(numInput === "") {
+                displayNumero.innerText = "00";
             } else {
-                displayNome.style.transform = `scaleX(1)`;
+                displayNumero.innerText = numInput.toString().padStart(2, '0');
+            }
+
+            // 2. Atualiza o Nome
+            displayNome.innerText = nomeInput.toUpperCase() || "NOME";
+
+            // 3. Lógica de Redimensionamento Proporcional
+            let fontSize = 16; // Tamanho máximo da fonte
+            displayNome.style.fontSize = fontSize + "px";
+
+            // Enquanto o nome for mais largo que o container, diminui a fonte
+            while (displayNome.offsetWidth > container.offsetWidth && fontSize > 6) {
+                fontSize -= 0.5;
+                displayNome.style.fontSize = fontSize + "px";
             }
         }
 
@@ -218,11 +217,11 @@
             const nNum = document.getElementById('numeroCamisa').value;
 
             if(!nPessoa || !nCamisa || !nNum) {
-                alert("Preencha tudo, craque!");
+                alert("Preencha todos os dados antes de concluir!");
                 return;
             }
 
-            alert("Pedido Enviado! Vamos gerar seu PIX.");
+            alert("Dados registrados! Preparando o pagamento...");
         }
     </script>
 </body>

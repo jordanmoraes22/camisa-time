@@ -48,45 +48,49 @@
             background-color: var(--cinza); 
             border-radius: 8px;
             border: 1px solid #333;
+            overflow: hidden; /* Importante para cortar textos que ultrapassarem a imagem */
         }
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* AREA DO NOME */
+        /* CONTAINER DO NOME - Posicionado exatamente na área de impressão das costas */
         .txt-nome-container {
             position: absolute;
-            top: 21%; /* Posição ajustada */
+            top: 19%; /* Ajustado para baixo, longe do pescoço */
             left: 50%;
             transform: translateX(-50%);
-            width: 80%; /* Aumentei a área útil */
-            height: 40px;
+            width: 92%; /* Ocupa quase toda a largura dos ombros */
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
+            z-index: 10;
         }
 
         #displayNome {
-            font-family: 'Impact', sans-serif; /* Fonte de peso de camisa */
-            font-size: 20px; /* Tamanho inicial maior */
+            font-family: 'Impact', sans-serif;
+            font-size: 20px;
             color: #ffffff;
             text-transform: uppercase;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
             white-space: nowrap;
             display: inline-block;
-            transition: 0.1s;
+            transition: font-size 0.2s ease;
         }
 
+        /* CONTAINER DO NÚMERO */
         .txt-numero {
             position: absolute;
-            top: 34%;
+            top: 40%; /* Ajustado para o centro das costas */
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Impact', sans-serif;
-            font-size: 55px; /* Número maior e mais imponente */
+            font-size: 55px;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
             pointer-events: none;
+            z-index: 5;
         }
 
         /* Formulário */
@@ -148,9 +152,13 @@
         <div class="camisa-box">
             <p class="legenda">COSTAS</p>
             <img src="Costas.png" class="camisa-img">
+            
+            <!-- Overlay do Nome -->
             <div class="txt-nome-container">
                 <span id="displayNome">JORDAN</span>
             </div>
+            
+            <!-- Overlay do Número -->
             <div id="displayNumero" class="txt-numero">00</div>
         </div>
     </div>
@@ -160,7 +168,7 @@
         <input type="text" id="nomePessoa" placeholder="Para identificação">
         
         <label>Nome na Camisa</label>
-        <input type="text" id="nomeCamisa" placeholder="Ex: MICHAEL JORDAN" oninput="atualizar()">
+        <input type="text" id="nomeCamisa" placeholder="Exemplo Como Michael Jordan" oninput="atualizar()">
         
         <label>Número (00-99)</label>
         <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
@@ -195,32 +203,24 @@
             displayNumero.innerText = numInput === "" ? "00" : numInput.toString().padStart(2, '0');
 
             // 2. Atualiza o Nome
-            displayNome.innerText = nomeInput.toUpperCase() || "JORDAN";
+            let text = nomeInput.toUpperCase() || "JORDAN";
+            displayNome.innerText = text;
 
-            // 3. Lógica de Redimensionamento Realista (Jersey Style)
-            // Resetamos para o padrão
-            displayNome.style.fontSize = "20px";
-            displayNome.style.transform = "scaleX(1)";
+            // 3. Lógica Matemática de Tamanho de Fonte (Sem deformação)
+            const containerWidth = container.offsetWidth;
+            const textLength = text.length;
 
-            let containerWidth = container.offsetWidth;
-            let textWidth = displayNome.offsetWidth;
+            // Fórmula: Cada letra em 'Impact' ocupa aproximadamente 58% do tamanho da fonte.
+            // Para caber na largura do container:
+            // fontSize * textLength * 0.58 <= containerWidth
+            // fontSize <= containerWidth / (textLength * 0.58)
 
-            if (textWidth > containerWidth) {
-                // Primeiro, tentamos diminuir a fonte um pouco (até 14px)
-                let newSize = 20;
-                while (displayNome.offsetWidth > containerWidth && newSize > 14) {
-                    newSize -= 1;
-                    displayNome.style.fontSize = newSize + "px";
-                }
+            let calculatedSize = containerWidth / (textLength * 0.58);
 
-                // Se ainda assim não couber, nós "achatamos" o nome (compressão horizontal)
-                let finalWidth = displayNome.offsetWidth;
-                if (finalWidth > containerWidth) {
-                    let ratio = containerWidth / finalWidth;
-                    displayNome.style.transform = `scaleX(${ratio})`;
-                    displayNome.style.transformOrigin = "center";
-                }
-            }
+            // Limita a tamanho entre 15px (mínimo legível) e 24px (máximo padrão de camisa)
+            let finalSize = Math.max(15, Math.min(24, calculatedSize));
+
+            displayNome.style.fontSize = finalSize + "px";
         }
 
         function concluir() {

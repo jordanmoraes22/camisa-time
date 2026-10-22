@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trem do Ódio EC - Camisas</title>
+    <title>Trem do Ódio EC - Personalize sua Camisa</title>
     <style>
         :root {
             --vermelho: #cc0000;
@@ -51,13 +51,12 @@
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* AREA DO NOME - Agora com 58% para ficar longe dos ombros */
         .txt-nome-container {
             position: absolute;
             top: 22%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 58%; /* REDUZIDO para não tocar os ombros */
+            width: 58%; 
             height: 30px;
             display: flex;
             align-items: center;
@@ -75,7 +74,6 @@
             line-height: 1;
         }
 
-        /* AREA DO NÚMERO */
         .txt-numero {
             position: absolute;
             top: 36%;
@@ -113,9 +111,31 @@
             font-size: 14px;
         }
 
-        input:focus, select:focus { border-color: var(--vermelho); outline: none; }
+        /* Container do Tamanho com botão de info */
+        .tamanho-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-        button { 
+        .btn-info {
+            background: #444;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-style: italic;
+            cursor: pointer;
+            font-family: serif;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button.btn-proximo { 
             width: 100%; 
             padding: 15px; 
             background: var(--vermelho); 
@@ -129,13 +149,39 @@
             cursor: pointer;
         }
 
+        /* Modal da Tabela de Tamanhos */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 80%;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
         .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
 
     </style>
 </head>
 <body>
 
-    <h1>Sua camisa do Trem do Ódio EC</h1>
+    <h1>Personalize sua Camisa</h1>
 
     <div class="preview-container">
         <div class="camisa-box">
@@ -154,35 +200,34 @@
     </div>
 
     <div class="form-area">
-        <!-- Campo de Identificação -->
-        <label>Seu Nome Completo</label>
-        <input type="text" id="nomePessoa" placeholder="Para identificação do pedido">
+        <label>Seu Nome</label>
+        <input type="text" id="nomeIdentificacao" placeholder="Ex: João Silva">
 
-        <!-- Customização da Camisa -->
         <label>Nome na Camisa</label>
         <input type="text" id="nomeCamisa" placeholder="Ex: MICHAEL JORDAN" oninput="atualizar()">
         
         <label>Número (00-99)</label>
         <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
 
-        <!-- Tamanho -->
-        <label>Tamanho da Camisa</label>
-        <select id="tamanhoCamisa">
-            <option value="P">P</option>
-            <option value="M">M</option>
-            <option value="G">G</option>
-            <option value="GG">GG</option>
-            <option value="XG">XG (Sob consulta)</option>
-        </select>
-
-        <!-- Pagamento (Mantive para o fluxo fazer sentido) -->
-        <label>Opção de Pagamento</label>
-        <select id="pagamento">
-            <option value="50">PAGAR METADE (R$ 50,00)</option>
-            <option value="100">PAGAR TOTAL (R$ 100,00)</option>
-        </select>
+        <label>Tamanho</label>
+        <div class="tamanho-wrapper">
+            <select id="tamanhoCamisa">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+                <option value="XG">XG</option>
+            </select>
+            <button class="btn-info" onclick="abrirModal()">i</button>
+        </div>
         
-        <button onclick="concluir()">CONCLUIR PEDIDO</button>
+        <button class="btn-proximo" onclick="irParaPagamento()">PROSSEGUIR PARA PAGAMENTO</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalTamanho" class="modal">
+        <span class="modal-close" onclick="fecharModal()">&times;</span>
+        <img src="Tamanho.png" class="modal-content">
     </div>
 
     <script>
@@ -195,41 +240,42 @@
         function atualizar() {
             let nomeInput = document.getElementById('nomeCamisa').value;
             let numInput = document.getElementById('numeroCamisa').value;
-            
             const displayNome = document.getElementById('displayNome');
             const displayNumero = document.getElementById('displayNumero');
             const container = document.querySelector('.txt-nome-container');
 
-            // 1. Atualiza o Número
             displayNumero.innerText = numInput === "" ? "00" : numInput.toString().padStart(2, '0');
-
-            // 2. Atualiza o Nome
             displayNome.innerText = nomeInput.toUpperCase() || "JORDAN";
 
-            // 3. LOGICA DE ENCAIXE RIGOROSO
             let fontSize = 22; 
             displayNome.style.fontSize = fontSize + "px";
-
-            // Verifica se o nome cabe no container de 58% de largura
             while (displayNome.scrollWidth > container.offsetWidth && fontSize > 8) {
                 fontSize--;
                 displayNome.style.fontSize = fontSize + "px";
             }
         }
 
-        function concluir() {
-            const nPessoa = document.getElementById('nomePessoa').value;
-            const nCamisa = document.getElementById('nomeCamisa').value;
-            const nNum = document.getElementById('numeroCamisa').value;
-            const tamanho = document.getElementById('tamanhoCamisa').value;
+        function abrirModal() { document.getElementById('modalTamanho').style.display = "flex"; }
+        function fecharModal() { document.getElementById('modalTamanho').style.display = "none"; }
 
-            if(!nPessoa || !nCamisa || !nNum) {
-                alert("Por favor, preencha seu nome, o nome na camisa e o número!");
+        function irParaPagamento() {
+            const dados = {
+                identificacao: document.getElementById('nomeIdentificacao').value,
+                nomeCamisa: document.getElementById('nomeCamisa').value,
+                numero: document.getElementById('numeroCamisa').value,
+                tamanho: document.getElementById('tamanhoCamisa').value
+            };
+
+            if(!dados.identificacao || !dados.nomeCamisa || !dados.numero) {
+                alert("Por favor, preencha todos os campos!");
                 return;
             }
 
-            // Próximo passo será a integração com Google Sheets e PIX
-            alert("Pedido de " + nPessoa + " (Tam: " + tamanho + ") registrado com sucesso!");
+            // Salva na memória do navegador
+            localStorage.setItem('pedidoCamisa', JSON.stringify(dados));
+            
+            // Redireciona para a página de pagamento
+            window.location.href = "pagamento.html";
         }
     </script>
 </body>

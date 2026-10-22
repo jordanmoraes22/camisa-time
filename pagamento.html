@@ -17,23 +17,20 @@
         .btn-total { background: var(--vermelho); color: white; }
         .btn-livre { background: #007bff; color: white; }
         
-        #areaPix { display: none; margin-top: 20px; background: #fff; color: #000; padding: 15px; border-radius: 8px; animation: fadeIn 0.5s; }
+        #areaPix { display: none; margin-top: 20px; background: #fff; color: #000; padding: 15px; border-radius: 8px; }
         #codigoPix { word-break: break-all; font-family: monospace; font-size: 11px; margin: 10px 0; display: block; background: #eee; padding: 10px; border-radius: 4px; border: 1px dashed #ccc; }
         
-        .btn-whatsapp { background: #25d366; color: white; width: 100%; border: none; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; text-transform: uppercase; font-size: 16px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
-        
+        .btn-whatsapp { background: #25d366; color: white; width: 100%; border: none; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; text-transform: uppercase; font-size: 16px; }
         .aviso-prazo { font-size: 12px; color: #ffaa00; margin-top: 15px; background: rgba(255,170,0,0.1); padding: 10px; border-radius: 5px; border: 1px solid rgba(255,170,0,0.3); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h2>Pagamento</h2>
-        <p style="font-size: 13px; color: #aaa;">Toque em uma opção para copiar o código PIX</p>
+        <p style="font-size: 13px; color: #aaa;">Toque em uma opção para copiar o PIX</p>
         
-        <div id="resumoPedido" class="resumo"></div>
+        <div id="resumoPedido" class="resumo">Carregando detalhes...</div>
 
         <button class="btn-pix btn-metade" onclick="selecionarPix('metade')">
             <span>Pagar Metade (50%)</span>
@@ -51,20 +48,18 @@
         </button>
 
         <div id="areaPix">
-            <strong id="tituloPix">Código PIX Copiado!</strong>
+            <strong id="tituloPix">PIX Copiado!</strong>
             <span id="codigoPix"></span>
         </div>
 
         <div class="aviso-prazo">
-            <b>PRAZO:</b> 30 dias corridos para confecção após o fechamento do pedido.
+            <b>PRAZO:</b> 30 dias após confirmação do pagamento.
         </div>
 
-        <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">✅ Já paguei! Conferir na conta</button>
+        <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">✅ Já paguei! Informar no WhatsApp</button>
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
-        
         const PIX_CODES = {
             metade: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C",
             total: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4",
@@ -72,40 +67,38 @@
         };
 
         const params = new URLSearchParams(window.location.search);
-        const eRestante = params.get('fluxo') === 'restante';
-        let pedido = JSON.parse(localStorage.getItem('pedidoCamisa'));
-        let opcaoEscolhida = "";
+        const modoConsulta = params.get('modo') === 'consulta';
+        const zap = localStorage.getItem('user_whatsapp');
+        let pedido = JSON.parse(localStorage.getItem('pedidoCamisa')) || {};
 
-        // Lógica para carregar o resumo ou modo saldo
-        const resumoDiv = document.getElementById('resumoPedido');
-        if (eRestante) {
-            resumoDiv.innerHTML = "💰 <b>MODO: PAGAMENTO DE SALDO</b><br>Quitação do valor restante da camisa.";
-            pedido = { identificacao: "Pagamento de Saldo", nomeCamisa: "SALDO", numero: "00", tamanho: "N/A" };
-        } else if (!pedido) {
-            window.location.href = "index.html";
-        } else {
-            resumoDiv.innerHTML = `👤 <b>Atleta:</b> ${pedido.identificacao}<br>👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>📏 <b>Tamanho:</b> ${pedido.tamanho}`;
+        async function inicializar() {
+            const resumoDiv = document.getElementById('resumoPedido');
+            
+            if (modoConsulta) {
+                resumoDiv.innerHTML = "🔍 Consultando seu pedido via WhatsApp: " + zap;
+                // Aqui no futuro podemos fazer um fetch para pegar o saldo real da planilha
+                resumoDiv.innerHTML = `👤 <b>Modo:</b> Pagamento de Saldo Restante<br>📞 <b>WhatsApp:</b> ${zap}`;
+            } else if (pedido.identificacao) {
+                resumoDiv.innerHTML = `👤 <b>Atleta:</b> ${pedido.identificacao}<br>👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>📏 <b>Tamanho:</b> ${pedido.tamanho}`;
+            } else {
+                resumoDiv.innerHTML = "Dados não encontrados. Volte e refaça o pedido.";
+            }
         }
 
         function selecionarPix(tipo) {
-            opcaoEscolhida = tipo;
-            navigator.clipboard.writeText(PIX_CODES[tipo]).then(() => {
-                document.getElementById('codigoPix').innerText = PIX_CODES[tipo];
-                document.getElementById('areaPix').style.display = "block";
-                document.getElementById('btnWhatsapp').style.display = "block";
-                document.getElementById('tituloPix').innerText = "Código Copiado!";
-            });
+            navigator.clipboard.writeText(PIX_CODES[tipo]);
+            document.getElementById('codigoPix').innerText = PIX_CODES[tipo];
+            document.getElementById('areaPix').style.display = "block";
+            document.getElementById('btnWhatsapp').style.display = "block";
+            alert("Código PIX copiado com sucesso!");
         }
 
         function finalizar() {
-            // Salva na planilha (sem valor)
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({...pedido, opcaoPagamento: opcaoEscolhida}) });
-
-            // Mensagem atualizada
-            const textoZap = `Fala bonitão,\nPaguei a camisa do Trem do Ódio EC, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.\n\n*Pedido:* Camisa ${pedido.nomeCamisa.toUpperCase()} - Nº ${pedido.numero} - Tam ${pedido.tamanho}\n*Atleta:* ${pedido.identificacao}`;
-            
-            window.location.href = `https://api.whatsapp.com/send?phone=5531991595612&text=${encodeURIComponent(textoZap)}`;
+            const textoZap = `Paguei a camisa do Trem do Ódio EC, confere aí!\n\n*Pedido:* ${pedido.nomeCamisa || 'Saldo'} - Nº ${pedido.numero || '--'} - Tam ${pedido.tamanho || '--'}\n*Atleta:* ${pedido.identificacao || zap}`;
+            window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(textoZap)}`;
         }
+
+        inicializar();
     </script>
 </body>
 </html>

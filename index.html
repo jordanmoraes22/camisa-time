@@ -3,136 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camisa do Time - Pro Clubs</title>
+    <title>Camisa Pro Clubs - Red & Black</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f0f; color: white; margin: 0; padding: 20px; }
-        h1 { color: #25d366; margin-bottom: 30px; text-align: center; }
-        
-        .main-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        :root {
+            --vermelho: #cc0000;
+            --preto: #000000;
+            --cinza: #1a1a1a;
+        }
 
-        /* Container das Camisas */
-        .camisas-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; }
+        body { 
+            font-family: 'Arial Black', sans-serif; 
+            background-color: var(--preto); 
+            color: white; 
+            margin: 0; 
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { 
+            color: var(--vermelho); 
+            font-size: 22px; 
+            text-transform: uppercase; 
+            margin: 15px 0;
+            text-shadow: 2px 2px 0px #440000;
+        }
+        
+        /* Layout das Camisas */
+        .preview-container {
+            display: flex;
+            flex-direction: row; /* Lado a lado no desktop */
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
+        }
 
         .camisa-box { 
             position: relative; 
-            width: 320px; 
-            min-height: 400px; 
-            background-color: #1a1a1a; 
-            border-radius: 10px;
-            overflow: hidden;
+            width: 48%; /* Ajusta para caber duas na linha */
+            background-color: var(--cinza); 
+            border-radius: 8px;
+            border: 1px solid #333;
         }
 
-        .camisa-img { width: 100%; display: block; }
+        .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* Ajuste do Nome e Número */
-        .txt-nome {
+        /* Ajuste do Nome Automático */
+        .txt-nome-container {
             position: absolute;
-            top: 22%; /* Se o nome ficar alto ou baixo demais, mude esse número */
+            top: 22%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 80%;
-            font-size: 24px;
-            font-weight: 800;
+            width: 75%; /* Limite lateral para o nome */
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #displayNome {
+            font-size: 14px; /* Tamanho inicial */
+            font-weight: 900;
             color: #ffffff;
             text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            text-align: center;
-            pointer-events: none;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            white-space: nowrap;
+            display: inline-block;
         }
 
         .txt-numero {
             position: absolute;
-            top: 35%; /* Se o número ficar alto ou baixo demais, mude esse número */
+            top: 35%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 110px;
+            font-size: 45px; /* Tamanho ajustado para celular */
             font-weight: 900;
             color: #ffffff;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
             pointer-events: none;
         }
 
-        /* Formulário */
+        /* Formulário Estilizado */
         .form-area { 
-            background: #1a1a1a; 
-            padding: 25px; 
+            background: var(--cinza); 
+            padding: 20px; 
             border-radius: 15px; 
-            width: 100%; 
-            max-width: 350px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            width: 90%; 
+            max-width: 400px; 
             margin-top: 20px;
+            border-top: 4px solid var(--vermelho);
         }
         
-        label { display: block; text-align: left; margin: 10px 0 5px 5px; font-size: 14px; color: #aaa; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; background: #222; color: white; box-sizing: border-box; }
+        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 12px; color: #ff9999; font-weight: bold; }
+        
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 10px; 
+            border-radius: 5px; 
+            border: 1px solid #444; 
+            background: #000; 
+            color: white; 
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input:focus { border-color: var(--vermelho); outline: none; }
         
         button { 
             width: 100%; 
             padding: 15px; 
-            background: #25d366; 
-            color: black; 
+            background: var(--vermelho); 
+            color: white; 
             border: none; 
             font-size: 18px; 
             font-weight: bold; 
             cursor: pointer; 
-            border-radius: 8px; 
-            transition: 0.3s;
+            border-radius: 5px; 
+            margin-top: 10px;
+            text-transform: uppercase;
         }
-        button:hover { background: #1eb954; transform: scale(1.02); }
 
-        p.legenda { margin: 5px 0; font-weight: bold; color: #888; text-align: center; }
+        .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
+
+        /* Media Query para telas muito pequenas */
+        @media (max-width: 360px) {
+            .txt-numero { font-size: 35px; }
+            #displayNome { font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
     <h1>Personalize seu Manto</h1>
 
-    <div class="main-container">
-        
-        <div class="camisas-wrapper">
-            <!-- Frente -->
-            <div class="camisa-box">
-                <p class="legenda">FRENTE</p>
-                <img src="Frente.png" class="camisa-img" id="imgFrente">
-            </div>
-
-            <!-- Costas -->
-            <div class="camisa-box">
-                <p class="legenda">COSTAS</p>
-                <img src="Costas.png" class="camisa-img" id="imgCostas">
-                <div id="displayNome" class="txt-nome">SEU NOME</div>
-                <div id="displayNumero" class="txt-numero">00</div>
-            </div>
+    <div class="preview-container">
+        <!-- Frente -->
+        <div class="camisa-box">
+            <p class="legenda">FRENTE</p>
+            <img src="Frente.png" class="camisa-img">
         </div>
 
-        <div class="form-area">
-            <label>NOME COMPLETO</label>
-            <input type="text" id="nomePessoa" placeholder="Seu Nome Real">
-            
-            <label>NOME NA CAMISA</label>
-            <input type="text" id="nomeCamisa" placeholder="Ex: JORDAN" maxlength="15" oninput="atualizar()">
-            
-            <label>NÚMERO</label>
-            <input type="number" id="numeroCamisa" placeholder="Ex: 10" oninput="atualizar()">
-            
-            <label>PAGAMENTO</label>
-            <select id="pagamento">
-                <option value="50">Pagar Metade (R$ 50,00)</option>
-                <option value="100">Pagar Total (R$ 100,00)</option>
-            </select>
-
-            <button onclick="concluir()">CONCLUIR PEDIDO</button>
+        <!-- Costas -->
+        <div class="camisa-box">
+            <p class="legenda">COSTAS</p>
+            <img src="Costas.png" class="camisa-img">
+            <div class="txt-nome-container">
+                <span id="displayNome">SEU NOME</span>
+            </div>
+            <div id="displayNumero" class="txt-numero">00</div>
         </div>
     </div>
 
+    <div class="form-area">
+        <label>NOME COMPLETO DO JOGADOR</label>
+        <input type="text" id="nomePessoa" placeholder="Nome para a lista">
+        
+        <label>NOME NA CAMISA</label>
+        <input type="text" id="nomeCamisa" placeholder="Ex: XxxTentencion" oninput="atualizar()">
+        
+        <label>NÚMERO (00-99)</label>
+        <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
+        
+        <label>OPÇÃO DE PAGAMENTO</label>
+        <select id="pagamento">
+            <option value="50">PAGAR METADE (R$ 50,00)</option>
+            <option value="100">PAGAR TOTAL (R$ 100,00)</option>
+        </select>
+
+        <button onclick="concluir()">CONCLUIR PEDIDO</button>
+    </div>
+
     <script>
+        function validarNumero() {
+            let campo = document.getElementById('numeroCamisa');
+            // Impede mais de 2 dígitos
+            if (campo.value.length > 2) {
+                campo.value = campo.value.slice(0, 2);
+            }
+            atualizar();
+        }
+
         function atualizar() {
-            let nome = document.getElementById('nomeCamisa').value;
-            let num = document.getElementById('numeroCamisa').value;
+            let nomeInput = document.getElementById('nomeCamisa').value;
+            let numInput = document.getElementById('numeroCamisa').value;
             
-            // Atualiza o texto na camisa em tempo real
-            document.getElementById('displayNome').innerText = nome.toUpperCase() || "SEU NOME";
-            document.getElementById('displayNumero').innerText = num || "00";
+            const displayNome = document.getElementById('displayNome');
+            const displayNumero = document.getElementById('displayNumero');
+
+            // Atualiza o Número
+            displayNumero.innerText = numInput.padStart(2, '0').slice(-2);
+
+            // Atualiza o Nome
+            displayNome.innerText = nomeInput.toUpperCase() || "SEU NOME";
+
+            // Lógica de Escala (Achatamento do nome)
+            let containerWidth = document.querySelector('.txt-nome-container').offsetWidth;
+            let currentWidth = displayNome.offsetWidth;
+            
+            if (currentWidth > containerWidth) {
+                let escala = containerWidth / currentWidth;
+                displayNome.style.transform = `scaleX(${escala})`;
+            } else {
+                displayNome.style.transform = `scaleX(1)`;
+            }
         }
 
         function concluir() {
@@ -141,11 +218,11 @@
             const nNum = document.getElementById('numeroCamisa').value;
 
             if(!nPessoa || !nCamisa || !nNum) {
-                alert("Por favor, preencha todos os campos antes de continuar!");
+                alert("Preencha tudo, craque!");
                 return;
             }
 
-            alert("Dados registrados com sucesso! Vamos para a etapa do pagamento.");
+            alert("Pedido Enviado! Vamos gerar seu PIX.");
         }
     </script>
 </body>

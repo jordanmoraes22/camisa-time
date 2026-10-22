@@ -1,103 +1,153 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Personalizar Camisa - Trem do Ódio</title>
-    <style>
-        :root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
-        body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:15px;display:flex;flex-direction:column;align-items:center}
-        h1{font-family:'Impact',sans-serif;color:var(--red);text-transform:uppercase;margin:10px 0;font-size:20px}
-        .preview{display:flex;gap:10px;margin-bottom:15px;width:100%;max-width:400px}
-        .box{position:relative;width:50%;background:var(--gray);border-radius:8px;border:1px solid #333}
-        .box img{width:100%;display:block;border-radius:8px}
-        .txt-nome{position:absolute;top:22%;left:50%;transform:translateX(-50%);width:60%;text-align:center;font-family:'Impact',sans-serif;font-size:18px;color:#fff;text-transform:uppercase;white-space:nowrap;overflow:hidden}
-        .txt-num{position:absolute;top:38%;left:50%;transform:translateX(-50%);font-family:'Impact',sans-serif;font-size:45px;color:#fff;text-shadow:2px 2px 4px #000}
-        .form{background:var(--gray);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);box-sizing:border-box}
-        label{display:block;margin:10px 0 5px;font-size:12px;color:#888;text-transform:uppercase;font-weight:bold}
-        input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;background:#000;color:#fff;font-size:14px;box-sizing:border-box}
-        .tamanho-row{display:flex;gap:10px;align-items:center}
-        .tamanho-row select{flex:1}
-        .info-i{width:40px;height:40px;background:var(--red);border:none;color:#fff;border-radius:5px;font-weight:bold;cursor:pointer;font-size:18px}
-        .btn-enviar{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:8px;margin-top:20px;font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase}
-        .btn-enviar:disabled{background:#444}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:100;align-items:center;justify-content:center}
-        .modal.active{display:flex}
-        .modal img{max-width:90%;border:2px solid var(--red);border-radius:10px}
-    </style>
+<meta charset="UTF-8">
+<title>Personalizar Camisa</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
+body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:15px;
+      display:flex;flex-direction:column;align-items:center}
+h1{font-family:'Impact',sans-serif;color:var(--red);margin:10px 0;font-size:22px}
+.preview{display:flex;gap:10px;margin:15px 0;width:100%;max-width:360px}
+.box{position:relative;width:50%;background:var(--gray);border-radius:8px;
+      border:1px solid #333;overflow:hidden}
+.box img{width:100%;display:block}
+.txt-nome,.txt-num{
+    position:absolute;left:50%;transform:translateX(-50%);font-family:'Impact',sans-serif;
+    color:#fff;text-align:center;white-space:nowrap;overflow:hidden}
+.txt-nome{top:22%;width:60%;font-size:16px}
+.txt-num{top:38%;font-size:42px}
+.form{background:var(--gray);padding:20px;border-radius:15px;width:100%;max-width:360px;
+      border-top:4px solid var(--red);box-sizing:border-box}
+label{display:block;margin:10px 0 5px;font-size:12px;color:#888;text-transform:uppercase}
+input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;
+            background:#000;color:#fff;font-size:14px;box-sizing:border-box}
+.tam-row{display:flex;gap:8px;align-items:center}
+.tam-row select{flex:1}
+.info{width:38px;height:38px;background:var(--red);border:none;color:#fff;
+      border-radius:5px;font-weight:bold;cursor:pointer;font-size:18px}
+.btn{margin-top:20px;width:100%;padding:16px;background:var(--red);
+     color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:bold;
+     cursor:pointer;text-transform:uppercase}
+.btn:disabled{background:#444;cursor:not-allowed}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+       background:rgba(0,0,0,0.95);align-items:center;justify-content:center;z-index:100}
+.modal.active{display:flex}
+.modal img{max-width:90%;border:2px solid var(--red);border-radius:10px}
+</style>
 </head>
 <body>
 
 <h1>Personalize sua Camisa</h1>
 
 <div class="preview">
-    <div class="box"><img src="Frente.png"></div>
+    <div class="box"><img src="Frente.png" alt="Frente"></div>
     <div class="box">
-        <img src="Costas.png">
+        <img src="Costas.png" alt="Costas">
         <div id="prevNome" class="txt-nome">SNOOP DOG</div>
-        <div id="prevNum" class="txt-num">99</div>
+        <div id="prevNum"  class="txt-num">99</div>
     </div>
 </div>
 
 <div class="form">
-    <label>WhatsApp (DDD + Número)</label>
-    <input type="tel" id="whatsapp" placeholder="Ex: 31991595612">
-    <label>Seu Nome (Para Identificação)</label>
-    <input type="text" id="nomeCli" placeholder="Ex: Boneco Bot">
+    <label>WhatsApp (DDD + número)</label>
+    <input type="tel" id="whats" placeholder="Ex.: 31991595612">
+
+    <label>Seu nome (para identificação)</label>
+    <input type="text" id="cliNome" placeholder="Ex.: Boneco Bot">
+
     <label>Nome na Camisa</label>
-    <input type="text" id="camisaNom" placeholder="Ex: Snoop Dog" oninput="upd()">
+    <input type="text" id="camisaNome" placeholder="Ex.: SNOOP DOG" oninput="atualizaPreview()">
+
     <label>Número na Camisa</label>
-    <input type="number" id="camisaNum" placeholder="99" oninput="upd()">
+    <input type="number" id="camisaNum" placeholder="99" oninput="atualizaPreview()">
+
     <label>Tamanho</label>
-    <div class="tamanho-row">
-        <select id="tamanho"><option>P</option><option>M</option><option selected>G</option><option>GG</option><option>XG</option></select>
-        <button class="info-i" onclick="document.getElementById('mSize').classList.add('active')">i</button>
+    <div class="tam-row">
+        <select id="tam">
+            <option>P</option>
+            <option>M</option>
+            <option selected>G</option>
+            <option>GG</option>
+            <option>XG</option>
+        </select>
+        <button class="info" onclick="document.getElementById('tamModal').classList.add('active')">i</button>
     </div>
-    <button id="btnMain" class="btn-enviar" onclick="enviar()">Concluir Pedido</button>
+
+    <button id="btnEnviar" class="btn" onclick="criarPedido()">Concluir Pedido</button>
 </div>
 
-<div id="mSize" class="modal" onclick="this.classList.remove('active')"><img src="Tamanho.png"></div>
+<div id="tamModal" class="modal" onclick="this.classList.remove('active')">
+    <img src="Tamanho.png" alt="Tabela de Tamanhos">
+</div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjJ0TDvyc42Y4AJlt4NWXnKMVqWlkm6_bNx3pL76KAV1OVdsJZVUmfrOzp7tAyQKm2CQ/exec";
+/* -------------------- CONFIGURAÇÕES -------------------- */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyb8QC2CaDZXGdSrHUNTbsdwlxrNUVoUVLV8bNUTMnSXTuF-qvGG2uwMqCkZgs4dYiemg/exec";
+const PRECO = 75.40;
 
-function upd(){
-    document.getElementById('prevNome').innerText = (document.getElementById('camisaNom').value || "SNOOP DOG").toUpperCase();
-    let n = document.getElementById('camisaNum').value;
-    document.getElementById('prevNum').innerText = n ? n.toString().padStart(2,'0') : "99";
+/* -------------------- PREVIEW -------------------- */
+function atualizaPreview(){
+    const nome = document.getElementById('camisaNome').value.trim() || "SNOOP DOG";
+    const num  = document.getElementById('camisaNum').value;
+    document.getElementById('prevNome').innerText = nome.toUpperCase();
+    document.getElementById('prevNum' ).innerText = num ? num.toString().padStart(2,'0') : "99";
 }
 
-async function enviar(){
-    const btn = document.getElementById('btnMain');
-    const zap = document.getElementById('whatsapp').value.replace(/\D/g,'');
-    const nome = document.getElementById('nomeCli').value.trim();
-    if(!zap || !nome){ alert("Preencha WhatsApp e Nome!"); return; }
+/* -------------------- CRIAÇÃO -------------------- */
+async function criarPedido(){
+    const btn = document.getElementById('btnEnviar');
+
+    // ----- validação rápida -----
+    const zapRaw = document.getElementById('whats').value;
+    const zap = zapRaw.replace(/\D/g,'');
+    const nomeCli = document.getElementById('cliNome').value.trim();
+
+    if(!zap || zap.length < 10){
+        alert('Informe um WhatsApp válido');
+        return;
+    }
+    if(!nomeCli){
+        alert('Informe seu nome');
+        return;
+    }
 
     btn.disabled = true;
-    btn.innerText = "Procurando partida de liga...";
+    btn.innerText = "Procurando partida de liga…";
 
-    try {
-        // Mudamos para Content-Type text/plain para o Google aceitar sem dar erro de CORS
-        // Mas sem o mode: no-cors para podermos ler a resposta
-        const resp = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                action: 'CREATE_ORDER',
-                whatsapp: zap,
-                nome: nome,
-                camisaNome: document.getElementById('camisaNom').value,
-                camisaNumero: document.getElementById('camisaNum').value,
-                tamanho: document.getElementById('tamanho').value
-            })
+    const payload = {
+        action: "CREATE_ORDER",
+        whatsapp: zap,
+        nome: nomeCli,
+        camisaNome: document.getElementById('camisaNome').value,
+        camisaNumero: document.getElementById('camisaNum').value,
+        tamanho: document.getElementById('tam').value
+    };
+
+    try{
+        const resp = await fetch(GAS_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
         });
-        
+        const json = await resp.json();
+
+        if(json.status!=='success'){
+            throw new Error(json.message||'Erro desconhecido');
+        }
+
+        // guarda o telefone para a tela de pagamento
         localStorage.setItem('user_whatsapp', zap);
         btn.innerText = "PARTIDA ENCONTRADA!";
         btn.style.background = "#25d366";
-        setTimeout(()=> window.location.href='pagamento.html', 1000);
-    } catch (e) {
+
+        setTimeout(()=> window.location.href='pagamento.html', 1200);
+    }catch(e){
+        console.error(e);
+        alert('Falha ao comunicar com o servidor. Tente novamente.');
         btn.disabled = false;
-        btn.innerText = "ERRO AO CONECTAR";
+        btn.innerText = "Concluir Pedido";
     }
 }
 </script>

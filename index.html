@@ -51,6 +51,7 @@
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
+        /* AREA DO NOME */
         .txt-nome-container {
             position: absolute;
             top: 22%; 
@@ -72,8 +73,10 @@
             white-space: nowrap;
             display: block;
             line-height: 1;
+            font-size: 22px;
         }
 
+        /* AREA DO NÚMERO */
         .txt-numero {
             position: absolute;
             top: 36%;
@@ -111,7 +114,6 @@
             font-size: 14px;
         }
 
-        /* Container do Tamanho com botão de info */
         .tamanho-wrapper {
             display: flex;
             gap: 10px;
@@ -122,17 +124,18 @@
             background: #444;
             color: white;
             border: none;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             font-weight: bold;
             font-style: italic;
             cursor: pointer;
             font-family: serif;
-            font-size: 18px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         button.btn-proximo { 
@@ -149,7 +152,7 @@
             cursor: pointer;
         }
 
-        /* Modal da Tabela de Tamanhos */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -158,21 +161,25 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.9);
+            background-color: rgba(0,0,0,0.85);
             justify-content: center;
             align-items: center;
         }
         .modal-content {
             max-width: 90%;
             max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         .modal-close {
             position: absolute;
             top: 20px;
-            right: 30px;
+            right: 25px;
             color: white;
-            font-size: 40px;
+            font-size: 45px;
+            font-weight: bold;
             cursor: pointer;
+            z-index: 110;
         }
 
         .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
@@ -193,28 +200,28 @@
             <p class="legenda">COSTAS</p>
             <img src="Costas.png" class="camisa-img">
             <div class="txt-nome-container">
-                <span id="displayNome">JORDAN</span>
+                <span id="displayNome">SNOOP DOGG</span>
             </div>
-            <div id="displayNumero" class="txt-numero">00</div>
+            <div id="displayNumero" class="txt-numero">99</div>
         </div>
     </div>
 
     <div class="form-area">
         <label>Seu Nome</label>
-        <input type="text" id="nomeIdentificacao" placeholder="Ex: João Silva">
+        <input type="text" id="nomeIdentificacao" placeholder="Ex: Boneco Bot">
 
         <label>Nome na Camisa</label>
-        <input type="text" id="nomeCamisa" placeholder="Ex: MICHAEL JORDAN" oninput="atualizar()">
+        <input type="text" id="nomeCamisa" placeholder="Ex: Snoop Dogg" oninput="atualizar()">
         
         <label>Número (00-99)</label>
-        <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
+        <input type="number" id="numeroCamisa" placeholder="99" oninput="validarNumero()">
 
         <label>Tamanho</label>
         <div class="tamanho-wrapper">
             <select id="tamanhoCamisa">
                 <option value="P">P</option>
                 <option value="M">M</option>
-                <option value="G">G</option>
+                <option value="G" selected>G</option> <!-- Default G -->
                 <option value="GG">GG</option>
                 <option value="XG">XG</option>
             </select>
@@ -225,9 +232,9 @@
     </div>
 
     <!-- Modal -->
-    <div id="modalTamanho" class="modal">
+    <div id="modalTamanho" class="modal" onclick="fecharModalExterno(event)">
         <span class="modal-close" onclick="fecharModal()">&times;</span>
-        <img src="Tamanho.png" class="modal-content">
+        <img src="Tamanho.png" class="modal-content" id="imgModal">
     </div>
 
     <script>
@@ -244,8 +251,8 @@
             const displayNumero = document.getElementById('displayNumero');
             const container = document.querySelector('.txt-nome-container');
 
-            displayNumero.innerText = numInput === "" ? "00" : numInput.toString().padStart(2, '0');
-            displayNome.innerText = nomeInput.toUpperCase() || "JORDAN";
+            displayNumero.innerText = numInput === "" ? "99" : numInput.toString().padStart(2, '0');
+            displayNome.innerText = (nomeInput || "Snoop Dogg").toUpperCase();
 
             let fontSize = 22; 
             displayNome.style.fontSize = fontSize + "px";
@@ -255,26 +262,33 @@
             }
         }
 
+        // Funções do Modal
         function abrirModal() { document.getElementById('modalTamanho').style.display = "flex"; }
         function fecharModal() { document.getElementById('modalTamanho').style.display = "none"; }
+        
+        // Fecha ao clicar fora da imagem
+        function fecharModalExterno(event) {
+            const img = document.getElementById('imgModal');
+            if (event.target !== img) {
+                fecharModal();
+            }
+        }
 
         function irParaPagamento() {
             const dados = {
-                identificacao: document.getElementById('nomeIdentificacao').value,
-                nomeCamisa: document.getElementById('nomeCamisa').value,
-                numero: document.getElementById('numeroCamisa').value,
+                identificacao: document.getElementById('nomeIdentificacao').value || "Boneco Bot",
+                nomeCamisa: document.getElementById('nomeCamisa').value || "Snoop Dogg",
+                numero: document.getElementById('numeroCamisa').value || "99",
                 tamanho: document.getElementById('tamanhoCamisa').value
             };
 
-            if(!dados.identificacao || !dados.nomeCamisa || !dados.numero) {
-                alert("Por favor, preencha todos os campos!");
+            // Se o usuário não digitou nada nos campos obrigatórios, avisa.
+            if(!document.getElementById('nomeIdentificacao').value || !document.getElementById('nomeCamisa').value || !document.getElementById('numeroCamisa').value) {
+                alert("Por favor, preencha todos os campos antes de prosseguir!");
                 return;
             }
 
-            // Salva na memória do navegador
             localStorage.setItem('pedidoCamisa', JSON.stringify(dados));
-            
-            // Redireciona para a página de pagamento
             window.location.href = "pagamento.html";
         }
     </script>

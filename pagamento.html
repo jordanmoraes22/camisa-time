@@ -7,90 +7,124 @@
 <style>
 :root{--vermelho:#cc0000;--preto:#000;--cinza:#1a1a1a}
 body{font-family:Arial,sans-serif;background:#000;color:#fff;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
-.card{background:var(--cinza);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--vermelho);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.card{background:var(--cinza);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--vermelho);text-align:center}
 h2{color:var(--vermelho);text-transform:uppercase;font-family:'Impact';margin-bottom:5px}
 .resumo{text-align:left;background:#000;padding:15px;border-radius:8px;margin:15px 0;font-size:14px;line-height:1.6;border:1px solid #333}
 .resumo b{color:var(--vermelho)}
-.btn-pix{width:100%;padding:15px;margin:8px 0;border:none;border-radius:8px;font-weight:bold;cursor:pointer;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+.saldo-box{background:#111;padding:10px;border-radius:5px;margin-bottom:15px;border:1px solid #444}
+.pago{color:#25d366;font-weight:bold}
+.deve{color:var(--vermelho);font-weight:bold}
+.btn-pix{width:100%;padding:15px;margin:8px 0;border:none;border-radius:8px;font-weight:bold;cursor:pointer;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
 .btn-metade{background:#333;color:#fff;border:1px solid #555}
 .btn-total{background:var(--vermelho);color:#fff}
-.btn-livre{background:#007bff;color:#fff}
 #areaPix{display:none;margin-top:20px;background:#fff;color:#000;padding:15px;border-radius:8px;text-align:left}
-#codigoPix{word-break:break-all;font-family:monospace;font-size:11px;margin:10px 0;display:block;background:#eee;padding:10px;border-radius:4px;border:1px dashed #ccc}
-.btn-whatsapp{background:#25d366;color:#fff;width:100%;border:none;padding:18px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:20px;display:none;text-transform:uppercase;font-size:16px}
-.erro-msg{color:#ff4444;font-weight:bold;margin:20px 0}
+#codigoPix{word-break:break-all;font-family:monospace;font-size:11px;background:#eee;padding:10px;display:block}
+.btn-whatsapp{background:#25d366;color:#fff;width:100%;border:none;padding:18px;border-radius:8px;font-weight:bold;margin-top:20px;display:none;cursor:pointer}
 </style>
 </head>
 <body>
 
 <div class="card">
     <h2>Pagamento</h2>
-    <div id="resumoPedido" class="resumo">Carregando...</div>
+    <div id="resumoPedido" class="resumo">Buscando dados na planilha...</div>
 
-    <div id="botoesPagamento">
+    <div id="botoesPagamento" style="display:none">
         <button class="btn-pix btn-metade" onclick="selecionarPix('metade')">
-            <span>Pagar Metade (50%)</span><span>R$ 37,70</span>
+            <span>Pagar Metade (50%)</span><span id="labelMetade">R$ 37,70</span>
         </button>
         <button class="btn-pix btn-total" onclick="selecionarPix('total')">
-            <span>Pagar Total (100%)</span><span>R$ 75,40</span>
+            <span>Pagar Restante</span><span id="labelRestante">R$ 75,40</span>
         </button>
-        <button class="btn-pix btn-livre" onclick="selecionarPix('livre')">
-            <span>Outro Valor / Chave</span><span>➔</span>
+        
+        <div id="areaPix">
+            <strong>Código copiado! ✅</strong>
+            <span id="codigoPix"></span>
+        </div>
+
+        <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">
+            ✅ Já paguei! Informar no WhatsApp
         </button>
     </div>
-
-    <div id="areaPix">
-        <strong>Código PIX copiado! ✅</strong>
-        <span id="codigoPix"></span>
-    </div>
-
-    <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">
-        ✅ Já paguei! Informar no WhatsApp
-    </button>
 </div>
 
 <script>
-const PIX_CODES = {
-    metade: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C",
-    total:  "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4",
-    livre:  "00020126360014br.gov.bcb.pix0114+55319915956125204000053039865802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720771829146304B432"
-};
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
+const PIX_KEY = "31991595612"; 
 
-const params = new URLSearchParams(window.location.search);
-const modoConsulta = params.get('modo') === 'consulta';
-const zapSalvo = localStorage.getItem('user_whatsapp');
-const ped = JSON.parse(localStorage.getItem('pedidoCamisa') || 'null');
+let dadosPedido = null;
 
-function init(){
+async function init() {
+    const zap = localStorage.getItem('user_whatsapp');
     const box = document.getElementById('resumoPedido');
-    if(modoConsulta){
-        if(!ped) {
-            box.innerHTML = `<div class="erro-msg">PEDIDO NÃO LOCALIZADO</div><button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content:center">VOLTAR</button>`;
-            document.getElementById('botoesPagamento').style.display='none';
-            return;
+
+    if (!zap) {
+        box.innerHTML = "WhatsApp não encontrado. Volte ao início.";
+        return;
+    }
+
+    try {
+        // Busca real na planilha
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'GET_ORDER', whatsapp: zap })
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            dadosPedido = result.data;
+            const falta = dadosPedido.valorTotal - dadosPedido.valorPago;
+
+            box.innerHTML = `
+                👤 <b>Nome:</b> ${dadosPedido.nome}<br>
+                👕 <b>Camisa:</b> ${dadosPedido.camisaNome.toUpperCase()} (Nº ${dadosPedido.camisaNumero})<br>
+                📏 <b>Tamanho:</b> ${dadosPedido.tamanho}<br>
+                <div class="saldo-box">
+                    💰 Total: R$ ${dadosPedido.valorTotal.toFixed(2)}<br>
+                    <span class="pago">✅ Pago: R$ ${dadosPedido.valorPago.toFixed(2)}</span><br>
+                    <span class="deve">🚨 Falta: R$ ${falta.toFixed(2)}</span>
+                </div>
+            `;
+
+            document.getElementById('labelRestante').innerText = `R$ ${falta.toFixed(2)}`;
+            document.getElementById('botoesPagamento').style.display = 'block';
+            
+            // Se já pagou tudo
+            if(falta <= 0) {
+                document.getElementById('botoesPagamento').innerHTML = "<p style='color:#25d366;font-weight:bold'>PEDIDO TOTALMENTE PAGO! 🚀</p>";
+            }
+
+        } else {
+            box.innerHTML = "Pedido não encontrado na planilha. Verifique o número ou faça um novo pedido.";
         }
-        box.innerHTML = `📞 <b>WhatsApp:</b> ${zapSalvo}<br>👕 <b>Camisa:</b> ${ped.nomeCamisa.toUpperCase()} | Nº ${ped.numero}`;
-    } else if(ped){
-        box.innerHTML = `👤 <b>Nome:</b> ${ped.identificacao}<br>👕 <b>Camisa:</b> ${ped.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${ped.numero}<br>📏 <b>Tamanho:</b> ${ped.tamanho}`;
-    } else {
-        box.innerHTML = `<div class="erro-msg">ERRO AO CARREGAR</div>`;
+    } catch (e) {
+        box.innerHTML = "Erro ao conectar com o servidor. Tente novamente.";
     }
 }
 
-function selecionarPix(tipo){
-    navigator.clipboard.writeText(PIX_CODES[tipo]);
-    document.getElementById('codigoPix').innerText = PIX_CODES[tipo];
+function selecionarPix(tipo) {
+    const falta = dadosPedido.valorTotal - dadosPedido.valorPago;
+    let valor = tipo === 'metade' ? 37.70 : falta;
+    
+    // Gerador de código estático (simplificado para o exemplo)
+    // No mundo real, aqui você usaria a função de gerar o copia e cola do seu banco
+    const codigos = {
+        metade: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C",
+        total: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4"
+    };
+
+    let copiaCola = tipo === 'metade' ? codigos.metade : codigos.total;
+    
+    navigator.clipboard.writeText(copiaCola);
+    document.getElementById('codigoPix').innerText = copiaCola;
     document.getElementById('areaPix').style.display = 'block';
     document.getElementById('btnWhatsapp').style.display = 'block';
 }
 
-function finalizar(){
-    const msg = `Fala bonitão,
-Paguei a camisa no site, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.
-
-Pedido: ${ped?.identificacao || 'Não informado'} - Nº ${ped?.numero || '99'} - Tam ${ped?.tamanho || 'M'} - Nome na camisa: ${ped?.nomeCamisa || 'teste teste'}`;
+function finalizar() {
+    const msg = `Olá! Realizei o pagamento da camisa do Trem do Ódio.\nNome: ${dadosPedido.nome}\nWhatsApp: ${localStorage.getItem('user_whatsapp')}`;
     window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(msg)}`;
 }
+
 init();
 </script>
 </body>

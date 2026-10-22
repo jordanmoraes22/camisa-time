@@ -16,15 +16,15 @@
         .btn-metade { background: #333; color: white; border: 1px solid #555; }
         .btn-total { background: var(--vermelho); color: white; }
         .btn-livre { background: #007bff; color: white; }
-        .btn-pix:active { transform: scale(0.98); }
-
+        
         #areaPix { display: none; margin-top: 20px; background: #fff; color: #000; padding: 15px; border-radius: 8px; animation: fadeIn 0.5s; }
         #codigoPix { word-break: break-all; font-family: monospace; font-size: 11px; margin: 10px 0; display: block; background: #eee; padding: 10px; border-radius: 4px; border: 1px dashed #ccc; }
         
         .btn-whatsapp { background: #25d366; color: white; width: 100%; border: none; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; text-transform: uppercase; font-size: 16px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
         
+        .aviso-prazo { font-size: 12px; color: #ffaa00; margin-top: 15px; background: rgba(255,170,0,0.1); padding: 10px; border-radius: 5px; border: 1px solid rgba(255,170,0,0.3); }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .check-icon { font-size: 20px; }
     </style>
 </head>
 <body>
@@ -47,13 +47,16 @@
 
         <button class="btn-pix btn-livre" onclick="selecionarPix('livre')">
             <span>Outro Valor / Chave</span>
-            <span class="check-icon">➔</span>
+            <span>➔</span>
         </button>
 
         <div id="areaPix">
             <strong id="tituloPix">Código PIX Copiado!</strong>
             <span id="codigoPix"></span>
-            <p style="font-size: 12px; margin: 0;">Abra o app do seu banco e use o <strong>PIX Copia e Cola</strong>.</p>
+        </div>
+
+        <div class="aviso-prazo">
+            <b>PRAZO:</b> 30 dias corridos para confecção após o fechamento do pedido.
         </div>
 
         <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">✅ Já paguei! Conferir na conta</button>
@@ -62,68 +65,46 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
         
-        // Seus códigos PIX estáticos
         const PIX_CODES = {
             metade: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C",
             total: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4",
             livre: "00020126360014br.gov.bcb.pix0114+55319915956125204000053039865802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720771829146304B432"
         };
 
+        const params = new URLSearchParams(window.location.search);
+        const eRestante = params.get('fluxo') === 'restante';
         let pedido = JSON.parse(localStorage.getItem('pedidoCamisa'));
         let opcaoEscolhida = "";
 
-        if (!pedido) { window.location.href = "index.html"; }
-
-        // Preenche resumo
-        document.getElementById('resumoPedido').innerHTML = `
-            👤 <b>Atleta:</b> ${pedido.identificacao}<br>
-            👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>
-            📏 <b>Tamanho:</b> ${pedido.tamanho}
-        `;
+        // Lógica para carregar o resumo ou modo saldo
+        const resumoDiv = document.getElementById('resumoPedido');
+        if (eRestante) {
+            resumoDiv.innerHTML = "💰 <b>MODO: PAGAMENTO DE SALDO</b><br>Quitação do valor restante da camisa.";
+            pedido = { identificacao: "Pagamento de Saldo", nomeCamisa: "SALDO", numero: "00", tamanho: "N/A" };
+        } else if (!pedido) {
+            window.location.href = "index.html";
+        } else {
+            resumoDiv.innerHTML = `👤 <b>Atleta:</b> ${pedido.identificacao}<br>👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>📏 <b>Tamanho:</b> ${pedido.tamanho}`;
+        }
 
         function selecionarPix(tipo) {
             opcaoEscolhida = tipo;
-            const codigo = PIX_CODES[tipo];
-            
-            // Copia para o clipboard
-            navigator.clipboard.writeText(codigo).then(() => {
-                document.getElementById('codigoPix').innerText = codigo;
+            navigator.clipboard.writeText(PIX_CODES[tipo]).then(() => {
+                document.getElementById('codigoPix').innerText = PIX_CODES[tipo];
                 document.getElementById('areaPix').style.display = "block";
                 document.getElementById('btnWhatsapp').style.display = "block";
-                
-                // Feedback visual de copiado
-                if(tipo === 'livre') {
-                    document.getElementById('tituloPix').innerText = "Chave Copiada! (Valor Livre)";
-                } else {
-                    document.getElementById('tituloPix').innerText = "Código R$ " + (tipo === 'metade' ? '37,70' : '75,40') + " Copiado!";
-                }
+                document.getElementById('tituloPix').innerText = "Código Copiado!";
             });
         }
 
         function finalizar() {
-            // 1. Envia para a planilha em background (sem travar)
-            const dadosPlanilha = {
-                identificacao: pedido.identificacao,
-                nomeCamisa: pedido.nomeCamisa,
-                numero: pedido.numero,
-                tamanho: pedido.tamanho,
-                opcaoPagamento: opcaoEscolhida,
-                valorPago: "" // Você preenche na mão
-            };
+            // Salva na planilha (sem valor)
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({...pedido, opcaoPagamento: opcaoEscolhida}) });
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(dadosPlanilha)
-            });
-
-            // 2. Monta mensagem do Whats (sem valores, conforme pedido)
-            const textoZap = `Fala bonitão,\nPaguei a camisa no site, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.\n\n*Pedido:* Camisa ${pedido.nomeCamisa.toUpperCase()} - Nº ${pedido.numero} - Tam ${pedido.tamanho}\n*Atleta:* ${pedido.identificacao}`;
+            // Mensagem atualizada
+            const textoZap = `Fala bonitão,\nPaguei a camisa do Trem do Ódio EC, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.\n\n*Pedido:* Camisa ${pedido.nomeCamisa.toUpperCase()} - Nº ${pedido.numero} - Tam ${pedido.tamanho}\n*Atleta:* ${pedido.identificacao}`;
             
-            const linkZap = `https://api.whatsapp.com/send?phone=5531991595612&text=${encodeURIComponent(textoZap)}`;
-            
-            // Abre o whatsapp
-            window.location.href = linkZap;
+            window.location.href = `https://api.whatsapp.com/send?phone=5531991595612&text=${encodeURIComponent(textoZap)}`;
         }
     </script>
 </body>

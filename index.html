@@ -28,7 +28,6 @@
             text-transform: uppercase; 
             margin: 15px 0;
             text-align: center;
-            line-height: 1.2;
             font-family: 'Impact', sans-serif;
             letter-spacing: 1px;
         }
@@ -48,49 +47,44 @@
             background-color: var(--cinza); 
             border-radius: 8px;
             border: 1px solid #333;
-            overflow: hidden; /* Importante para cortar textos que ultrapassarem a imagem */
         }
 
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* CONTAINER DO NOME - Posicionado exatamente na área de impressão das costas */
+        /* AREA DO NOME - Limitada pelas linhas azuis (68% de largura) */
         .txt-nome-container {
             position: absolute;
-            top: 19%; /* Ajustado para baixo, longe do pescoço */
+            top: 22%; /* Posicionado na altura certa das costas */
             left: 50%;
             transform: translateX(-50%);
-            width: 92%; /* Ocupa quase toda a largura dos ombros */
-            height: 35px;
+            width: 68%; /* LARGURA CRÍTICA: Ajustada para as suas linhas azuis */
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            z-index: 10;
+            overflow: hidden; /* Garante que nada saia das linhas */
         }
 
         #displayNome {
             font-family: 'Impact', sans-serif;
-            font-size: 20px;
             color: #ffffff;
             text-transform: uppercase;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
             white-space: nowrap;
-            display: inline-block;
-            transition: font-size 0.2s ease;
+            display: block;
+            line-height: 1;
         }
 
-        /* CONTAINER DO NÚMERO */
+        /* AREA DO NÚMERO */
         .txt-numero {
             position: absolute;
-            top: 40%; /* Ajustado para o centro das costas */
+            top: 36%;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Impact', sans-serif;
-            font-size: 55px;
+            font-size: 50px;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            pointer-events: none;
-            z-index: 5;
         }
 
         /* Formulário */
@@ -98,16 +92,16 @@
             background: var(--cinza); 
             padding: 20px; 
             border-radius: 15px; 
-            width: 90%; 
+            width: 95%; 
             max-width: 400px; 
             margin-top: 20px;
             border-top: 4px solid var(--vermelho);
             box-sizing: border-box;
         }
         
-        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 12px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
+        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 11px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
         
-        input, select { 
+        input { 
             width: 100%; 
             padding: 12px; 
             margin-bottom: 10px; 
@@ -119,8 +113,6 @@
             font-size: 16px;
         }
 
-        input:focus { border-color: var(--vermelho); outline: none; }
-        
         button { 
             width: 100%; 
             padding: 15px; 
@@ -129,13 +121,12 @@
             border: none; 
             font-size: 18px; 
             font-weight: bold; 
-            cursor: pointer; 
             border-radius: 5px; 
             margin-top: 10px;
             text-transform: uppercase;
         }
 
-        .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; font-family: sans-serif; }
+        .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
 
     </style>
 </head>
@@ -152,42 +143,27 @@
         <div class="camisa-box">
             <p class="legenda">COSTAS</p>
             <img src="Costas.png" class="camisa-img">
-            
-            <!-- Overlay do Nome -->
             <div class="txt-nome-container">
-                <span id="displayNome">JORDAN</span>
+                <span id="displayNome">MICHAEL JORDAN</span>
             </div>
-            
-            <!-- Overlay do Número -->
             <div id="displayNumero" class="txt-numero">00</div>
         </div>
     </div>
 
     <div class="form-area">
-        <label>Seu Nome</label>
-        <input type="text" id="nomePessoa" placeholder="Para identificação">
-        
         <label>Nome na Camisa</label>
-        <input type="text" id="nomeCamisa" placeholder="Exemplo Como Michael Jordan" oninput="atualizar()">
+        <input type="text" id="nomeCamisa" placeholder="Ex: MICHAEL JORDAN" oninput="atualizar()">
         
         <label>Número (00-99)</label>
         <input type="number" id="numeroCamisa" placeholder="10" oninput="validarNumero()">
         
-        <label>Opção de Pagamento</label>
-        <select id="pagamento">
-            <option value="50">PAGAR METADE (R$ 50,00)</option>
-            <option value="100">PAGAR TOTAL (R$ 100,00)</option>
-        </select>
-
         <button onclick="concluir()">CONCLUIR PEDIDO</button>
     </div>
 
     <script>
         function validarNumero() {
             let campo = document.getElementById('numeroCamisa');
-            if (campo.value.length > 2) {
-                campo.value = campo.value.slice(0, 2);
-            }
+            if (campo.value.length > 2) campo.value = campo.value.slice(0, 2);
             atualizar();
         }
 
@@ -203,37 +179,18 @@
             displayNumero.innerText = numInput === "" ? "00" : numInput.toString().padStart(2, '0');
 
             // 2. Atualiza o Nome
-            let text = nomeInput.toUpperCase() || "JORDAN";
-            displayNome.innerText = text;
+            displayNome.innerText = nomeInput.toUpperCase() || "MICHAEL JORDAN";
 
-            // 3. Lógica Matemática de Tamanho de Fonte (Sem deformação)
-            const containerWidth = container.offsetWidth;
-            const textLength = text.length;
+            // 3. LOGICA DE ENCAIXE RIGOROSO
+            let fontSize = 22; // Tamanho inicial máximo
+            displayNome.style.fontSize = fontSize + "px";
 
-            // Fórmula: Cada letra em 'Impact' ocupa aproximadamente 58% do tamanho da fonte.
-            // Para caber na largura do container:
-            // fontSize * textLength * 0.58 <= containerWidth
-            // fontSize <= containerWidth / (textLength * 0.58)
-
-            let calculatedSize = containerWidth / (textLength * 0.58);
-
-            // Limita a tamanho entre 15px (mínimo legível) e 24px (máximo padrão de camisa)
-            let finalSize = Math.max(15, Math.min(24, calculatedSize));
-
-            displayNome.style.fontSize = finalSize + "px";
-        }
-
-        function concluir() {
-            const nPessoa = document.getElementById('nomePessoa').value;
-            const nCamisa = document.getElementById('nomeCamisa').value;
-            const nNum = document.getElementById('numeroCamisa').value;
-
-            if(!nPessoa || !nCamisa || !nNum) {
-                alert("Preencha todos os dados antes de concluir!");
-                return;
+            // Enquanto a largura real do texto (scrollWidth) for maior que o container (68%), 
+            // ele diminui a fonte de 1 em 1 pixel.
+            while (displayNome.scrollWidth > container.offsetWidth && fontSize > 8) {
+                fontSize--;
+                displayNome.style.fontSize = fontSize + "px";
             }
-
-            alert("Dados registrados! Preparando o pagamento...");
         }
     </script>
 </body>

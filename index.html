@@ -4,6 +4,32 @@
 <meta charset="UTF-8">
 <title>Trem do Ódio EC – Camisas Oficiais</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- ===== OPEN GRAPH / WHATSAPP / FACEBOOK - CORRIGIDO ===== -->
+<!-- URL CANÔNICA EXATA (HTTPS + DOMÍNIO CORRETO + BARRA FINAL) -->
+<meta property="og:url" content="https://jordanmoraes22.github.io/camisa-time/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Trem do Ódio EC – Camisas Oficiais" />
+<meta property="og:description" content="Personalize e compre a camisa oficial do Trem do Ódio EC. Qualidade, tradição e paixão." />
+<!-- IMAGEM ABSOLUTA, TAMANHO IDEAL 1200x630px, MENOR QUE 300KB -->
+<meta property="og:image" content="https://jordanmoraes22.github.io/camisa-time/Logo.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Camisa Oficial Trem do Ódio EC" />
+<meta property="og:site_name" content="Trem do Ódio EC" />
+<meta property="og:locale" content="pt_BR" />
+
+<!-- TWITTER / WHATSAPP FALLBACK (summary_large_image garante imagem grande no chat) -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Trem do Ódio EC – Camisas Oficiais" />
+<meta name="twitter:description" content="Personalize e compre a camisa oficial do Trem do Ódio EC." />
+<meta name="twitter:image" content="https://jordanmoraes22.github.io/camisa-time/Logo.png" />
+<meta name="twitter:image:alt" content="Camisa Oficial Trem do Ódio EC" />
+
+<!-- FAVICON (OPCIONAL, MAS BOM PARA CREDIBILIDADE) -->
+<link rel="icon" href="Logo.png" type="image/png">
+
+<!-- ===== SEU CSS ORIGINAL ===== -->
 <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
     body{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;padding:20px;text-align:center}
@@ -24,7 +50,7 @@
 </head>
 <body>
 
-<img src="Logo.png" alt="Logo" class="logo">
+<img src="Logo.png" alt="Logo Trem do Ódio EC" class="logo">
 <h1>TREM DO ÓDIO EC</h1>
 
 <button class="btn btn-pedir" onclick="novoPedido()">QUERO PEDIR MINHA CAMISA</button>
@@ -46,6 +72,7 @@
 
 <script>
 function novoPedido(){
+    // Limpa apenas o whatsapp salvo para forçar novo fluxo, mantendo outros dados se needed
     localStorage.removeItem('user_whatsapp');
     window.location.href='pedido.html';
 }
@@ -63,7 +90,7 @@ function pagarRestante(){
         alert('Telefone inválido – digite ao menos 10 números.');
         return;
     }
-    // Salva o WhatsApp para a próxima tela consultar
+    // Salva o WhatsApp digitado no modal para a tela de pagamento buscar os pedidos
     localStorage.setItem('user_whatsapp', raw);
     fecharModalZap();
     window.location.href='pagamento.html';

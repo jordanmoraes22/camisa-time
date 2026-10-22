@@ -3,85 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trem do Ódio EC - Camisas Oficiais</title>
-    <meta property="og:title" content="Trem do Ódio EC - Camisas Oficiais">
-    <meta property="og:description" content="Garanta sua camisa personalizada do Trem do Ódio EC. Prazo de fabricação: 30 dias.">
-    <meta property="og:image" content="Logo.png">
-    <meta property="og:url" content="https://jordanmoraes22.github.io/camisa-time/">
+    <title>Trem do Ódio EC - Landing</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0d0d0d; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .container { width: 100%; max-width: 400px; text-align: center; }
-        .logo { width: 100%; max-width: 280px; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-        h1 { font-weight: 700; font-size: 1.5rem; margin-bottom: 5px; letter-spacing: 0.5px; }
-        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; line-height: 1.4; }
-        .btn { display: block; width: 100%; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: 700; text-decoration: none; text-align: center; transition: transform 0.1s, filter 0.2s; border: none; cursor: pointer; }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: linear-gradient(135deg, #ff6b00, #e65a00); color: #fff; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4); }
-        .btn-secondary { background: #1a1a1a; color: #fff; border: 1px solid #333; margin-bottom: 30px; }
-        .btn-secondary:active { background: #2a2a2a; }
-        .info-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 15px; margin-bottom: 30px; font-size: 0.85rem; color: #ccc; text-align: left; }
-        .info-box strong { color: #ff6b00; display: block; margin-bottom: 5px; text-align: center; }
-        .support-btn { background: #25D366; color: #fff; width: 100%; }
-        .support-btn:active { background: #1ebd5a; }
-        .footer-note { font-size: 0.75rem; color: #555; margin-top: auto; padding-bottom: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; }
+        .logo { width: 200px; margin: 20px 0; }
+        h1 { color: #cc0000; font-family: 'Impact', sans-serif; margin-bottom: 20px; }
+        .btn { display: block; width: 100%; max-width: 300px; padding: 15px; margin: 10px 0; border-radius: 8px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; font-size: 16px; }
+        .btn-pedir { background: #cc0000; color: #fff; }
+        .btn-restante { background: #333; color: #fff; border: 1px solid #444; }
+        .aviso { font-size: 12px; color: #888; margin-top: 20px; max-width: 300px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <img src="Logo.png" alt="Trem do Ódio EC" class="logo">
-        <h1>Camisa Oficial 2024</h1>
-        <p class="subtitle">Personalize seu nome, número e tamanho. Pagamento via PIX.</p>
+    <img src="Logo.png" alt="Logo" class="logo">
+    <h1>TREM DO ÓDIO EC</h1>
 
-        <button class="btn btn-primary" id="btn-novo-pedido">Quero Pedir Minha Camisa</button>
-        <button class="btn btn-secondary" id="btn-pagar-restante">Pagar Valor Restante</button>
+    <button onclick="novoPedido()" class="btn btn-pedir">QUERO PEDIR MINHA CAMISA</button>
+    <button onclick="pagarRestante()" class="btn btn-restante">PAGAR VALOR RESTANTE</button>
 
-        <div class="info-box">
-            <strong>⏳ PRAZO DE FABRICAÇÃO: 30 DIAS ÚTEIS</strong>
-            Após a confirmação do pagamento (total ou parcial), sua camisa entra na fila de produção. O prazo começa a contar a partir da data de confirmação financeira.
-        </div>
-
-        <a href="https://wa.me/5531991595612?text=Olá! Tenho dúvidas sobre a camisa do Trem do Ódio EC." target="_blank" class="btn support-btn">Tenho dúvidas / Falar no WhatsApp</a>
-
-        <p class="footer-note">Trem do Ódio EC • Todos os direitos reservados</p>
-    </div>
+    <p class="aviso">Prazo de fabricação: 30 dias após confirmação do pagamento.</p>
 
     <script>
-        // CONFIGURAÇÃO - COLE SUA URL DO APPS SCRIPT AQUI
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
+        function novoPedido() {
+            localStorage.clear();
+            window.location.href = 'pedido.html';
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const btnNovo = document.getElementById('btn-novo-pedido');
-            const btnPagar = document.getElementById('btn-pagar-restante');
-
-            // 1. NOVO PEDIDO -> Limpa sessão antiga e vai para pedido.html
-            btnNovo.addEventListener('click', () => {
-                // Limpa apenas dados de personalização, mantém o whatsapp se quiser (opcional)
-                const keysToKeep = []; // Se quiser manter o whatsapp, adicione 'user_whatsapp' aqui
-                Object.keys(localStorage).forEach(key => {
-                    if (!keysToKeep.includes(key)) localStorage.removeItem(key);
-                });
-                window.location.href = 'pedido.html';
-            });
-
-            // 2. PAGAR VALOR RESTANTE -> Pergunta WhatsApp, valida, salva e vai para pagamento.html?modo=consulta
-            btnPagar.addEventListener('click', async () => {
-                const tel = prompt('Digite seu WhatsApp com DDD (ex: 31999999999) para consultar seu pedido:');
-                if (!tel) return;
-
+        function pagarRestante() {
+            const tel = prompt("Digite seu WhatsApp com DDD (somente números):");
+            if (tel) {
                 const cleanTel = tel.replace(/\D/g, '');
-                if (cleanTel.length < 10 || cleanTel.length > 11) {
-                    alert('Número inválido. Verifique o DDD e o número.');
-                    return;
+                if (cleanTel.length >= 10) {
+                    localStorage.setItem('user_whatsapp', cleanTel);
+                    window.location.href = 'pagamento.html?modo=consulta';
+                } else {
+                    alert("Telefone inválido.");
                 }
-
-                // Salva o telefone normalizado para a página de pagamento usar
-                localStorage.setItem('user_whatsapp', cleanTel);
-                
-                // Redireciona com flag de consulta
-                window.location.href = 'pagamento.html?modo=consulta';
-            });
-        });
+            }
+        }
     </script>
 </body>
 </html>

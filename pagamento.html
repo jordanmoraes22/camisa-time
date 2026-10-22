@@ -1,94 +1,113 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamento - Trem do Ódio EC</title>
-    <style>
-        :root { --vermelho: #cc0000; --preto: #000000; --cinza: #1a1a1a; }
-        body { font-family: 'Arial', sans-serif; background: var(--preto); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--cinza); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; border-top: 4px solid var(--vermelho); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { color: var(--vermelho); text-transform: uppercase; font-family: 'Impact'; margin-bottom: 5px; }
-        .resumo { text-align: left; background: #000; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; line-height: 1.6; border: 1px solid #333; }
-        .resumo b { color: var(--vermelho); }
-        .btn-pix { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
-        .btn-metade { background: #333; color: white; border: 1px solid #555; }
-        .btn-total { background: var(--vermelho); color: white; }
-        .btn-livre { background: #007bff; color: white; }
-        #areaPix { display: none; margin-top: 20px; background: #fff; color: #000; padding: 15px; border-radius: 8px; }
-        #codigoPix { word-break: break-all; font-family: monospace; font-size: 11px; margin: 10px 0; display: block; background: #eee; padding: 10px; border-radius: 4px; border: 1px dashed #ccc; }
-        .btn-whatsapp { background: #25d366; color: white; width: 100%; border: none; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; text-transform: uppercase; font-size: 16px; }
-        .erro-msg { color: #ff4444; font-weight: bold; margin: 20px 0; }
-    </style>
+<meta charset="UTF-8">
+<title>Pagamento – Trem do Ódio EC</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--vermelho:#cc0000;--preto:#000;--cinza:#1a1a1a}
+body{font-family:Arial,sans-serif;background:#000;color:#fff;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
+.card{background:var(--cinza);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--vermelho);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+h2{color:var(--vermelho);text-transform:uppercase;font-family:'Impact';margin-bottom:5px}
+.resumo{text-align:left;background:#000;padding:15px;border-radius:8px;margin:15px 0;font-size:14px;line-height:1.6;border:1px solid #333}
+.resumo b{color:var(--vermelho)}
+.btn-pix{width:100%;padding:15px;margin:8px 0;border:none;border-radius:8px;font-weight:bold;cursor:pointer;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+.btn-metade{background:#333;color:#fff;border:1px solid #555}
+.btn-total{background:var(--vermelho);color:#fff}
+.btn-livre{background:#007bff;color:#fff}
+#areaPix{display:none;margin-top:20px;background:#fff;color:#000;padding:15px;border-radius:8px;text-align:left}
+#codigoPix{word-break:break-all;font-family:monospace;font-size:11px;margin:10px 0;display:block;background:#eee;padding:10px;border-radius:4px;border:1px dashed #ccc}
+.btn-whatsapp{background:#25d366;color:#fff;width:100%;border:none;padding:18px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:20px;display:none;text-transform:uppercase;font-size:16px}
+.erro-msg{color:#ff4444;font-weight:bold;margin:20px 0}
+</style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Pagamento</h2>
-        <div id="resumoPedido" class="resumo">Carregando...</div>
+<div class="card">
+    <h2>Pagamento</h2>
+    <div id="resumoPedido" class="resumo">Carregando...</div>
 
-        <div id="botoesPagamento">
-            <button class="btn-pix btn-metade" onclick="selecionarPix('metade')">
-                <span>Pagar Metade (50%)</span>
-                <span>R$ 37,70</span>
-            </button>
-            <button class="btn-pix btn-total" onclick="selecionarPix('total')">
-                <span>Pagar Total (100%)</span>
-                <span>R$ 75,40</span>
-            </button>
-            <button class="btn-pix btn-livre" onclick="selecionarPix('livre')">
-                <span>Outro Valor / Chave</span>
-                <span>➔</span>
-            </button>
-        </div>
-
-        <div id="areaPix">
-            <strong>PIX Copiado!</strong>
-            <span id="codigoPix"></span>
-        </div>
-
-        <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">✅ Já paguei! Informar no WhatsApp</button>
+    <div id="botoesPagamento">
+        <button class="btn-pix btn-metade" onclick="selecionarPix('metade')">
+            <span>Pagar Metade (50%)</span><span>R$ 37,70</span>
+        </button>
+        <button class="btn-pix btn-total" onclick="selecionarPix('total')">
+            <span>Pagar Total (100%)</span><span>R$ 75,40</span>
+        </button>
+        <button class="btn-pix btn-livre" onclick="selecionarPix('livre')">
+            <span>Outro Valor / Chave</span><span>➔</span>
+        </button>
     </div>
 
-    <script>
-        const PIX_CODES = {
-            metade: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C",
-            total: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4",
-            livre: "00020126360014br.gov.bcb.pix0114+55319915956125204000053039865802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720771829146304B432"
-        };
+    <div id="areaPix">
+        <strong>Código PIX copiado! ✅</strong>
+        <span id="codigoPix"></span>
+    </div>
 
-        const params = new URLSearchParams(window.location.search);
-        const modoConsulta = params.get('modo') === 'consulta';
-        const zap = localStorage.getItem('user_whatsapp');
-        let pedido = JSON.parse(localStorage.getItem('pedidoCamisa'));
+    <button id="btnWhatsapp" class="btn-whatsapp" onclick="finalizar()">
+        ✅ Já paguei! Informar no WhatsApp
+    </button>
+</div>
 
-        function inicializar() {
-            const resumoDiv = document.getElementById('resumoPedido');
-            
-            if (modoConsulta) {
-                resumoDiv.innerHTML = `👤 <b>Modo:</b> Pagamento de Saldo Restante<br>📞 <b>WhatsApp:</b> ${zap}<br><br><small>Atenção: Se você ainda não fez o pedido inicial, volte e selecione "Quero Pedir Minha Camisa".</small>`;
-            } else if (pedido) {
-                resumoDiv.innerHTML = `👤 <b>Nome:</b> ${pedido.identificacao}<br>👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>📏 <b>Tamanho:</b> ${pedido.tamanho}`;
-            } else {
-                resumoDiv.innerHTML = `<div class="erro-msg">PEDIDO NÃO LOCALIZADO</div><button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content: center;">VOLTAR AO INÍCIO</button>`;
-                document.getElementById('botoesPagamento').style.display = 'none';
-            }
+<script>
+const PIX_CODES = {
+    metade: "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540537.705802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720775081876304744C",
+    total:  "00020126360014br.gov.bcb.pix0114+5531991595612520400005303986540575.405802BR5913Jordan Moraes6009Sao Paulo62230519daqr217872077545874630494B4",
+    livre:  "00020126360014br.gov.bcb.pix0114+55319915956125204000053039865802BR5913Jordan Moraes6009Sao Paulo62230519daqr2178720771829146304B432"
+};
+
+const params = new URLSearchParams(window.location.search);
+const modoConsulta = params.get('modo') === 'consulta';
+const zapSalvo = localStorage.getItem('user_whatsapp');
+const pedido = JSON.parse(localStorage.getItem('pedidoCamisa') || 'null');
+
+function init(){
+    const box = document.getElementById('resumoPedido');
+
+    if(modoConsulta){
+        if(!zapSalvo || !pedido){
+            box.innerHTML = `<div class="erro-msg">Nenhum pedido encontrado para este WhatsApp.</div>
+                <button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content:center">VOLTAR AO INÍCIO</button>`;
+            document.getElementById('botoesPagamento').style.display='none';
+            return;
         }
+        box.innerHTML = `📞 <b>WhatsApp:</b> ${zapSalvo.replace(/(\d{2})(\d{4,5})(\d{4})/,'($1) $2-$3')}<br>
+                         👕 <b>Pedido:</b> ${pedido.nomeCamisa.toUpperCase()} | Nº ${pedido.numero} | ${pedido.tamanho}`;
+    }else if(pedido){
+        box.innerHTML = `👤 <b>Nome:</b> ${pedido.identificacao}<br>
+                         👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>
+                         📏 <b>Tamanho:</b> ${pedido.tamanho}`;
+    }else{
+        box.innerHTML = `<div class="erro-msg">PEDIDO NÃO LOCALIZADO</div>
+            <button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content:center">VOLTAR AO INÍCIO</button>`;
+        document.getElementById('botoesPagamento').style.display='none';
+    }
+}
 
-        function selecionarPix(tipo) {
-            navigator.clipboard.writeText(PIX_CODES[tipo]);
-            document.getElementById('codigoPix').innerText = PIX_CODES[tipo];
-            document.getElementById('areaPix').style.display = "block";
-            document.getElementById('btnWhatsapp').style.display = "block";
-            alert("Código PIX copiado!");
-        }
+function selecionarPix(tipo){
+    const codigo = PIX_CODES[tipo];
+    navigator.clipboard.writeText(codigo);
+    document.getElementById('codigoPix').innerText = codigo;
+    document.getElementById('areaPix').style.display = 'block';
+    document.getElementById('btnWhatsapp').style.display = 'block'; // Aparece na hora
+}
 
-        function finalizar() {
-            const textoZap = `Paguei a camisa do Trem do Ódio EC, confere aí!\n\n*Pedido:* ${pedido ? pedido.nomeCamisa : 'SALDO'} - Nº ${pedido ? pedido.numero : '--'}\n*Atleta:* ${pedido ? pedido.identificacao : zap}`;
-            window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(textoZap)}`;
-        }
+function finalizar(){
+    // Monta a mensagem EXATA que você pediu
+    const nome = pedido?.identificacao || 'Não informado';
+    const num  = pedido?.numero || '99';
+    const tam  = pedido?.tamanho || 'M';
+    const nCam = pedido?.nomeCamisa || 'teste teste';
 
-        inicializar();
-    </script>
+    const msg = `Fala bonitão,
+Paguei a camisa no site, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.
+
+Pedido: ${nome} - Nº ${num} - Tam ${tam} - Nome na camisa: ${nCam}`;
+
+    window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(msg)}`;
+}
+
+init();
+</script>
 </body>
 </html>

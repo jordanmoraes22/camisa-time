@@ -7,7 +7,7 @@
     <style>
         :root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
         body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:15px;display:flex;flex-direction:column;align-items:center}
-        h1{font-family:'Impact',sans-serif;color:var(--red);text-transform:uppercase;margin:10px 0;font-size:20px;letter-spacing:1px}
+        h1{font-family:'Impact',sans-serif;color:var(--red);text-transform:uppercase;margin:10px 0;font-size:20px}
         .preview{display:flex;gap:10px;margin-bottom:15px;width:100%;max-width:400px}
         .box{position:relative;width:50%;background:var(--gray);border-radius:8px;border:1px solid #333}
         .box img{width:100%;display:block;border-radius:8px}
@@ -16,14 +16,12 @@
         .form{background:var(--gray);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);box-sizing:border-box}
         label{display:block;margin:10px 0 5px;font-size:12px;color:#888;text-transform:uppercase;font-weight:bold}
         input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;background:#000;color:#fff;font-size:14px;box-sizing:border-box}
-        /* Container do Tamanho + Botão i */
-        .tamanho-container{display:flex;gap:8px;align-items:center}
-        .tamanho-container select{flex:1}
-        .info-btn{width:40px;height:40px;background:var(--red);border-radius:5px;border:none;color:#fff;font-weight:bold;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+        .tamanho-row{display:flex;gap:10px;align-items:center}
+        .tamanho-row select{flex:1}
+        .info-i{width:40px;height:40px;background:var(--red);border:none;color:#fff;border-radius:5px;font-weight:bold;cursor:pointer;font-size:18px}
         .btn-enviar{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:8px;margin-top:20px;font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase}
-        .btn-enviar:disabled{background:#444;cursor:wait}
-        /* Modal */
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:100;align-items:center;justify-content:center}
+        .btn-enviar:disabled{background:#444}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:100;align-items:center;justify-content:center}
         .modal.active{display:flex}
         .modal img{max-width:90%;border:2px solid var(--red);border-radius:10px}
     </style>
@@ -44,25 +42,17 @@
 <div class="form">
     <label>WhatsApp (DDD + Número)</label>
     <input type="tel" id="whatsapp" placeholder="Ex: 31991595612">
-    
     <label>Seu Nome (Para Identificação)</label>
     <input type="text" id="nomeCli" placeholder="Ex: Boneco Bot">
-    
     <label>Nome na Camisa</label>
     <input type="text" id="camisaNom" placeholder="Ex: Snoop Dog" oninput="upd()">
-    
     <label>Número na Camisa</label>
     <input type="number" id="camisaNum" placeholder="99" oninput="upd()">
-    
     <label>Tamanho</label>
-    <div class="tamanho-container">
-        <select id="tamanho">
-            <option>P</option><option>M</option><option selected>G</option>
-            <option>GG</option><option>XG</option>
-        </select>
-        <button type="button" class="info-btn" onclick="document.getElementById('mSize').classList.add('active')">i</button>
+    <div class="tamanho-row">
+        <select id="tamanho"><option>P</option><option>M</option><option selected>G</option><option>GG</option><option>XG</option></select>
+        <button class="info-i" onclick="document.getElementById('mSize').classList.add('active')">i</button>
     </div>
-
     <button id="btnMain" class="btn-enviar" onclick="enviar()">Concluir Pedido</button>
 </div>
 
@@ -72,38 +62,31 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjJ0TDvyc42Y4AJlt4NWXnKMVqWlkm6_bNx3pL76KAV1OVdsJZVUmfrOzp7tAyQKm2CQ/exec";
 
 function upd(){
-    // Atualiza nome: Se vazio mostra SNOOP DOG
-    let n = document.getElementById('camisaNom').value;
-    document.getElementById('prevNome').innerText = (n || "SNOOP DOG").toUpperCase();
-    
-    // Atualiza número: Se vazio mostra 99
-    let num = document.getElementById('camisaNum').value;
-    document.getElementById('prevNum').innerText = num ? num.toString().padStart(2,'0') : "99";
+    document.getElementById('prevNome').innerText = (document.getElementById('camisaNom').value || "SNOOP DOG").toUpperCase();
+    let n = document.getElementById('camisaNum').value;
+    document.getElementById('prevNum').innerText = n ? n.toString().padStart(2,'0') : "99";
 }
 
 async function enviar(){
     const btn = document.getElementById('btnMain');
     const zap = document.getElementById('whatsapp').value.replace(/\D/g,'');
     const nome = document.getElementById('nomeCli').value.trim();
-    const cNom = document.getElementById('camisaNom').value.trim();
-    const cNum = document.getElementById('camisaNum').value.trim();
-    
-    if(!zap || !nome || !cNom || !cNum){ alert("Por favor, preencha todos os campos!"); return; }
+    if(!zap || !nome){ alert("Preencha WhatsApp e Nome!"); return; }
 
     btn.disabled = true;
     btn.innerText = "Procurando partida de liga...";
 
     try {
-        await fetch(SCRIPT_URL, {
+        // Mudamos para Content-Type text/plain para o Google aceitar sem dar erro de CORS
+        // Mas sem o mode: no-cors para podermos ler a resposta
+        const resp = await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({
                 action: 'CREATE_ORDER',
                 whatsapp: zap,
                 nome: nome,
-                camisaNome: cNom,
-                camisaNumero: cNum,
+                camisaNome: document.getElementById('camisaNom').value,
+                camisaNumero: document.getElementById('camisaNum').value,
                 tamanho: document.getElementById('tamanho').value
             })
         });
@@ -111,8 +94,7 @@ async function enviar(){
         localStorage.setItem('user_whatsapp', zap);
         btn.innerText = "PARTIDA ENCONTRADA!";
         btn.style.background = "#25d366";
-        setTimeout(()=> window.location.href='pagamento.html', 1500);
-        
+        setTimeout(()=> window.location.href='pagamento.html', 1000);
     } catch (e) {
         btn.disabled = false;
         btn.innerText = "ERRO AO CONECTAR";

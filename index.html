@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trem do Ódio EC - Landing</title>
+    <title>Trem do Ódio EC - Camisas Oficiais</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
         body { background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; }
@@ -13,32 +13,35 @@
         .btn-pedir { background: #cc0000; color: #fff; }
         .btn-restante { background: #333; color: #fff; border: 1px solid #444; }
         .aviso { font-size: 12px; color: #888; margin-top: 20px; max-width: 300px; }
+        .support-btn { background: #25D366; color: white; width: 100%; max-width: 300px; padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: bold; text-decoration: none; display: block; }
     </style>
 </head>
 <body>
     <img src="Logo.png" alt="Logo" class="logo">
     <h1>TREM DO ÓDIO EC</h1>
 
-    <button onclick="novoPedido()" class="btn btn-pedir">QUERO PEDIR MINHA CAMISA</button>
+    <button onclick="novo(ibotaoPedir)" class="btn btn-pedir">QUERO PEDIR MINHA CAMISA</button>
     <button onclick="pagarRestante()" class="btn btn-restante">PAGAR VALOR RESTANTE</button>
 
     <p class="aviso">Prazo de fabricação: 30 dias após confirmação do pagamento.</p>
 
+    <a href="https://wa.me/5531991595612?text=Olá! Tenho dúvidas sobre a camisa do Trem do Ódio EC." target="_blank" class="support-btn">Tenho dúvidas / Falar no WhatsApp</a>
+
     <script>
-        function novoPedido() {
+        function novo(ibotaoPedir) {
             localStorage.clear();
-            window.location.href = 'pedido.html';
+            window.location.href = 'patient.html';
         }
 
         function pagarRestante() {
-            const tel = prompt("Digite seu WhatsApp com DDD (somente números):");
+            const tel = prompt("Digite seu WhatsApp com DDD (somente números):", "");
             if (tel) {
                 const cleanTel = tel.replace(/\D/g, '');
                 if (cleanTel.length >= 10) {
                     localStorage.setItem('user_whatsapp', cleanTel);
                     window.location.href = 'pagamento.html?modo=consulta';
                 } else {
-                    alert("Telefone inválido.");
+                    alert("Telefone inválido. Digite no mínimo 10 números.");
                 }
             }
         }

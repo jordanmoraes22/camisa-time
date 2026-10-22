@@ -39,22 +39,36 @@ button:disabled{background:#666;cursor:not-allowed}
 <div class="form">
     <label>WhatsApp (DDD + Número)</label>
     <input type="tel" id="whatsappCliente" placeholder="ex.: 31991595612" inputmode="numeric">
+
     <label>Seu Nome (Identificação)</label>
     <input type="text" id="nomeCliente" placeholder="ex.: Seu Nome">
+
     <label>Nome na Camisa</label>
     <input type="text" id="nomeCamisa" placeholder="ex.: Snoop Dogg" oninput="atualizar()">
+
     <label>Número (00‑99)</label>
     <input type="number" id="numeroCamisa" placeholder="99" oninput="validarNumero()" inputmode="numeric">
+
     <label>Tamanho</label>
     <select id="tamanhoCamisa">
-        <option value="P">P</option><option value="M">M</option><option value="G" selected>G</option><option value="GG">GG</option><option value="XG">XG</option>
+        <option value="P">P</option><option value="M">M</option><option value="G" selected>G</option>
+        <option value="GG">GG</option><option value="XG">XG</option>
     </select>
+
+    <div id="statusMsg" class="status-msg"></div>
     <button class="prox" id="btnEnviar" onclick="enviarPedido()">PROSSEGUIR PARA PAGAMENTO</button>
 </div>
 
+<div id="modalTamanho" class="modal" onclick="fecharModalExterno(event)">
+    <span class="modal-close" onclick="fecharModal()">&times;</span>
+    <img src="Tamanho.png" class="modal-content" id="imgModal">
+</div>
+
 <script>
+/* ---------- CONFIGURAÇÕES ---------- */
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
 
+/* ---------- FUNÇÕES DE UI ---------- */
 function validarNumero(){
     const c=document.getElementById('numeroCamisa');
     if(c.value.length>2) c.value=c.value.slice(0,2);
@@ -70,9 +84,12 @@ function atualizar(){
     dNome.innerText = (nome || "SNOOP DOGG").toUpperCase();
     let fs=22;
     dNome.style.fontSize=fs+'px';
-    while(dNome.scrollWidth > container.offsetWidth && fs>8){ fs--; dNome.style.fontSize=fs+'px'; }
+    while(dNome.scrollWidth > container.offsetWidth && fs>8){
+        fs--; dNome.style.fontSize=fs+'px';
+    }
 }
 
+/* ---------- ENVIO DO PEDIDO ---------- */
 async function enviarPedido(){
     const btn=document.getElementById('btnEnviar');
     const whatsapp=document.getElementById('whatsappCliente').value.replace(/\D/g,'');
@@ -81,10 +98,35 @@ async function enviarPedido(){
     const camisaNum=document.getElementById('numeroCamisa').value.trim();
     const tamanho=document.getElementById('tamanhoCamisa').value;
 
-    if(!whatsapp || !nomeCli || !camisaNom || !camisaNum){ alert('Preencha tudo!'); return; }
+    if(!whatsapp || !nomeCli || !camisaNom || !camisaNum){
+        alert('Preencha todos os campos!'); return;
+    }
 
     btn.disabled=true;
-    btn.innerText='Validando pedido...';
+    btn.innerText='Enviando dados...';
+
+    // Verifica se já existe pedido para este WhatsApp
+    const existing = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'GET_ORDER', whatsapp: whatsapp })
+    }).then(r=>r.json()).catch(()=>null);
+
+    if (existing && existing.status === 'success') {
+        // Já existe → usa os dados já salvos
+        localStorage.setItem('user_whatsapp', whatsapp);
+        window.location.href = 'pagamento.html';
+        return;
+    }
+
+    // Caso não exista, cria novo pedido
+    localStorage.setItem('user_whatsapp', whatsapp);
+    localStorage.setItem('pedCamisa', JSON.stringify({
+        identificacao: nomeCli,
+        nomeCamisa: camisaNom,
+        numero: camisaNum,
+        tamanho: tamanho
+    }));
 
     const payload = {
         action: 'CREATE_ORDER',
@@ -96,24 +138,17 @@ async function enviarPedido(){
     };
 
     try {
-        const response = await fetch(SCRIPT_URL, {
+        await fetch(SCRIPT_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        const res = await response.json();
-        
-        if(res.status === 'success'){
-            localStorage.setItem('user_whatsapp', whatsapp);
-            window.location.href = 'pagamento.html';
-        } else {
-            alert('Erro ao salvar pedido.');
-            btn.disabled=false;
-            btn.innerText='PROSSEGUIR PARA PAGAMENTO';
-        }
-    } catch(e) {
-        // Em caso de erro de rede, tentamos seguir mesmo assim se os dados locais existirem
-        localStorage.setItem('user_whatsapp', whatsapp);
-        window.location.href = 'pagamento.html';
+        btn.disabled=false;
+        btn.innerText='Partida encontrada!';
+        setTimeout(()=> window.location.href='pagamento.html', 500);
+    } catch (e) {
+        btn.disabled=false;
+        btn.innerText='Falha ao conectar ao servidor';
     }
 }
 </script>

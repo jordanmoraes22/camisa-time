@@ -7,18 +7,21 @@
     <style>
         :root{--red:#cc0000;--black:#000;--gray:#1a1a1a}
         body{background:var(--black);color:#fff;font-family:sans-serif;margin:0;padding:15px;display:flex;flex-direction:column;align-items:center}
-        h1{font-family:'Impact',sans-serif;color:var(--red);text-transform:uppercase;margin:10px 0;font-size:20px}
+        h1{font-family:'Impact',sans-serif;color:var(--red);text-transform:uppercase;margin:10px 0;font-size:20px;letter-spacing:1px}
         .preview{display:flex;gap:10px;margin-bottom:15px;width:100%;max-width:400px}
         .box{position:relative;width:50%;background:var(--gray);border-radius:8px;border:1px solid #333}
         .box img{width:100%;display:block;border-radius:8px}
         .txt-nome{position:absolute;top:22%;left:50%;transform:translateX(-50%);width:60%;text-align:center;font-family:'Impact',sans-serif;font-size:18px;color:#fff;text-transform:uppercase;white-space:nowrap;overflow:hidden}
         .txt-num{position:absolute;top:38%;left:50%;transform:translateX(-50%);font-family:'Impact',sans-serif;font-size:45px;color:#fff;text-shadow:2px 2px 4px #000}
-        .form{background:var(--gray);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);position:relative;box-sizing:border-box}
-        .info-btn{position:absolute;top:15px;right:15px;width:26px;height:26px;background:var(--red);border-radius:50%;border:none;color:#fff;font-weight:bold;cursor:pointer}
-        label{display:block;margin:10px 0 5px;font-size:12px;color:#888;text-transform:uppercase}
+        .form{background:var(--gray);padding:20px;border-radius:15px;width:100%;max-width:400px;border-top:4px solid var(--red);box-sizing:border-box}
+        label{display:block;margin:10px 0 5px;font-size:12px;color:#888;text-transform:uppercase;font-weight:bold}
         input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;background:#000;color:#fff;font-size:14px;box-sizing:border-box}
-        .btn{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:8px;margin-top:20px;font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase}
-        .btn:disabled{background:#444;cursor:wait}
+        /* Container do Tamanho + Botão i */
+        .tamanho-container{display:flex;gap:8px;align-items:center}
+        .tamanho-container select{flex:1}
+        .info-btn{width:40px;height:40px;background:var(--red);border-radius:5px;border:none;color:#fff;font-weight:bold;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+        .btn-enviar{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:8px;margin-top:20px;font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase}
+        .btn-enviar:disabled{background:#444;cursor:wait}
         /* Modal */
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:100;align-items:center;justify-content:center}
         .modal.active{display:flex}
@@ -33,63 +36,78 @@
     <div class="box"><img src="Frente.png"></div>
     <div class="box">
         <img src="Costas.png">
-        <div id="prevNome" class="txt-nome">SNOOP DOGG</div>
+        <div id="prevNome" class="txt-nome">SNOOP DOG</div>
         <div id="prevNum" class="txt-num">99</div>
     </div>
 </div>
 
 <div class="form">
-    <button class="info-btn" onclick="document.getElementById('mSize').classList.add('active')">i</button>
-    <label>WhatsApp</label>
-    <input type="tel" id="whatsapp" placeholder="31991595612">
-    <label>Seu Nome</label>
-    <input type="text" id="nomeCli" placeholder="João Silva">
+    <label>WhatsApp (DDD + Número)</label>
+    <input type="tel" id="whatsapp" placeholder="Ex: 31991595612">
+    
+    <label>Seu Nome (Para Identificação)</label>
+    <input type="text" id="nomeCli" placeholder="Ex: Boneco Bot">
+    
     <label>Nome na Camisa</label>
-    <input type="text" id="camisaNom" placeholder="SNOOP" oninput="upd()">
-    <label>Número</label>
+    <input type="text" id="camisaNom" placeholder="Ex: Snoop Dog" oninput="upd()">
+    
+    <label>Número na Camisa</label>
     <input type="number" id="camisaNum" placeholder="99" oninput="upd()">
+    
     <label>Tamanho</label>
-    <select id="tamanho"><option>P</option><option>M</option><option selected>G</option><option>GG</option><option>XG</option></select>
-    <button id="btnMain" class="btn" onclick="enviar()">Concluir Pedido</button>
+    <div class="tamanho-container">
+        <select id="tamanho">
+            <option>P</option><option>M</option><option selected>G</option>
+            <option>GG</option><option>XG</option>
+        </select>
+        <button type="button" class="info-btn" onclick="document.getElementById('mSize').classList.add('active')">i</button>
+    </div>
+
+    <button id="btnMain" class="btn-enviar" onclick="enviar()">Concluir Pedido</button>
 </div>
 
 <div id="mSize" class="modal" onclick="this.classList.remove('active')"><img src="Tamanho.png"></div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjJ0TDvyc42Y4AJlt4NWXnKMVqWlkm6_bNx3pL76KAV1OVdsJZVUmfrOzp7tAyQKm2CQ/exec";
 
 function upd(){
-    document.getElementById('prevNome').innerText = (document.getElementById('camisaNom').value || "SNOOP DOGG").toUpperCase();
-    let n = document.getElementById('camisaNum').value;
-    document.getElementById('prevNum').innerText = n ? n.toString().padStart(2,'0') : "99";
+    // Atualiza nome: Se vazio mostra SNOOP DOG
+    let n = document.getElementById('camisaNom').value;
+    document.getElementById('prevNome').innerText = (n || "SNOOP DOG").toUpperCase();
+    
+    // Atualiza número: Se vazio mostra 99
+    let num = document.getElementById('camisaNum').value;
+    document.getElementById('prevNum').innerText = num ? num.toString().padStart(2,'0') : "99";
 }
 
 async function enviar(){
     const btn = document.getElementById('btnMain');
     const zap = document.getElementById('whatsapp').value.replace(/\D/g,'');
     const nome = document.getElementById('nomeCli').value.trim();
+    const cNom = document.getElementById('camisaNom').value.trim();
+    const cNum = document.getElementById('camisaNum').value.trim();
     
-    if(!zap || !nome){ alert("Preencha WhatsApp e Nome!"); return; }
+    if(!zap || !nome || !cNom || !cNum){ alert("Por favor, preencha todos os campos!"); return; }
 
     btn.disabled = true;
     btn.innerText = "Procurando partida de liga...";
 
     try {
-        const resp = await fetch(SCRIPT_URL, {
+        await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // Evita erro de segurança
+            mode: 'no-cors',
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({
                 action: 'CREATE_ORDER',
                 whatsapp: zap,
                 nome: nome,
-                camisaNome: document.getElementById('camisaNom').value,
-                camisaNumero: document.getElementById('camisaNum').value,
+                camisaNome: cNom,
+                camisaNumero: cNum,
                 tamanho: document.getElementById('tamanho').value
             })
         });
         
-        // Como usamos no-cors, não lemos a resposta, mas sabemos que chegou se não der erro
         localStorage.setItem('user_whatsapp', zap);
         btn.innerText = "PARTIDA ENCONTRADA!";
         btn.style.background = "#25d366";

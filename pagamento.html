@@ -59,54 +59,38 @@ const PIX_CODES = {
 const params = new URLSearchParams(window.location.search);
 const modoConsulta = params.get('modo') === 'consulta';
 const zapSalvo = localStorage.getItem('user_whatsapp');
-const pedido = JSON.parse(localStorage.getItem('pedidoCamisa') || 'null');
+const ped = JSON.parse(localStorage.getItem('pedidoCamisa') || 'null');
 
 function init(){
     const box = document.getElementById('resumoPedido');
-
     if(modoConsulta){
-        if(!zapSalvo || !pedido){
-            box.innerHTML = `<div class="erro-msg">Nenhum pedido encontrado para este WhatsApp.</div>
-                <button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content:center">VOLTAR AO INÍCIO</button>`;
+        if(!ped) {
+            box.innerHTML = `<div class="erro-msg">PEDIDO NÃO LOCALIZADO</div><button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content:center">VOLTAR</button>`;
             document.getElementById('botoesPagamento').style.display='none';
             return;
         }
-        box.innerHTML = `📞 <b>WhatsApp:</b> ${zapSalvo.replace(/(\d{2})(\d{4,5})(\d{4})/,'($1) $2-$3')}<br>
-                         👕 <b>Pedido:</b> ${pedido.nomeCamisa.toUpperCase()} | Nº ${pedido.numero} | ${pedido.tamanho}`;
-    }else if(pedido){
-        box.innerHTML = `👤 <b>Nome:</b> ${pedido.identificacao}<br>
-                         👕 <b>Camisa:</b> ${pedido.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${pedido.numero}<br>
-                         📏 <b>Tamanho:</b> ${pedido.tamanho}`;
-    }else{
-        box.innerHTML = `<div class="erro-msg">PEDIDO NÃO LOCALIZADO</div>
-            <button onclick="window.location.href='index.html'" class="btn-pix btn-metade" style="justify-content:center">VOLTAR AO INÍCIO</button>`;
-        document.getElementById('botoesPagamento').style.display='none';
+        box.innerHTML = `📞 <b>WhatsApp:</b> ${zapSalvo}<br>👕 <b>Camisa:</b> ${ped.nomeCamisa.toUpperCase()} | Nº ${ped.numero}`;
+    } else if(ped){
+        box.innerHTML = `👤 <b>Nome:</b> ${ped.identificacao}<br>👕 <b>Camisa:</b> ${ped.nomeCamisa.toUpperCase()} | <b>Nº:</b> ${ped.numero}<br>📏 <b>Tamanho:</b> ${ped.tamanho}`;
+    } else {
+        box.innerHTML = `<div class="erro-msg">ERRO AO CARREGAR</div>`;
     }
 }
 
 function selecionarPix(tipo){
-    const codigo = PIX_CODES[tipo];
-    navigator.clipboard.writeText(codigo);
-    document.getElementById('codigoPix').innerText = codigo;
+    navigator.clipboard.writeText(PIX_CODES[tipo]);
+    document.getElementById('codigoPix').innerText = PIX_CODES[tipo];
     document.getElementById('areaPix').style.display = 'block';
-    document.getElementById('btnWhatsapp').style.display = 'block'; // Aparece na hora
+    document.getElementById('btnWhatsapp').style.display = 'block';
 }
 
 function finalizar(){
-    // Monta a mensagem EXATA que você pediu
-    const nome = pedido?.identificacao || 'Não informado';
-    const num  = pedido?.numero || '99';
-    const tam  = pedido?.tamanho || 'M';
-    const nCam = pedido?.nomeCamisa || 'teste teste';
-
     const msg = `Fala bonitão,
 Paguei a camisa no site, quando puder confere aí na conta. E aqui, domingo (25/10) é 13 nas cabeças.
 
-Pedido: ${nome} - Nº ${num} - Tam ${tam} - Nome na camisa: ${nCam}`;
-
+Pedido: ${ped?.identificacao || 'Não informado'} - Nº ${ped?.numero || '99'} - Tam ${ped?.tamanho || 'M'} - Nome na camisa: ${ped?.nomeCamisa || 'teste teste'}`;
     window.location.href = `https://wa.me/5531991595612?text=${encodeURIComponent(msg)}`;
 }
-
 init();
 </script>
 </body>

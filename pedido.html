@@ -9,30 +9,22 @@
         body { font-family: 'Arial', sans-serif; background-color: var(--preto); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         h1 { color: var(--vermelho); font-size: 18px; text-transform: uppercase; margin: 15px 0; text-align: center; font-family: 'Impact', sans-serif; letter-spacing: 1px; }
         
-        /* PREVIEW LADO A LADO */
         .preview-container { display: flex; flex-direction: row; gap: 10px; justify-content: center; width: 100%; max-width: 500px; }
         .camisa-box { position: relative; width: 48%; background-color: var(--cinza); border-radius: 8px; border: 1px solid #333; }
         .camisa-img { width: 100%; display: block; border-radius: 8px; }
 
-        /* NOME NAS COSTAS */
         .txt-nome-container { position: absolute; top: 22%; left: 50%; transform: translateX(-50%); width: 58%; height: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #displayNome { font-family: 'Impact', sans-serif; color: #ffffff; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); white-space: nowrap; font-size: 22px; }
-
-        /* NÚMERO NAS COSTAS */
         .txt-numero { position: absolute; top: 36%; left: 50%; transform: translateX(-50%); font-family: 'Impact', sans-serif; font-size: 50px; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
 
         .form-area { background: var(--cinza); padding: 20px; border-radius: 15px; width: 95%; max-width: 400px; margin-top: 20px; border-top: 4px solid var(--vermelho); box-sizing: border-box; margin-bottom: 30px; }
         label { display: block; text-align: left; margin: 12px 0 5px; font-size: 11px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 14px; }
-
         .tamanho-wrapper { display: flex; gap: 10px; align-items: center; }
-        .btn-info { background: #444; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
+        .btn-info { background: #444; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         button.btn-proximo { width: 100%; padding: 15px; background: var(--vermelho); color: white; border: none; font-size: 18px; font-weight: bold; border-radius: 5px; margin-top: 20px; text-transform: uppercase; cursor: pointer; }
-        button:disabled { background: #666; cursor: not-allowed; }
-
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        button:disabled { background: #666; opacity: 0.7; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
         .modal-content { max-width: 90%; max-height: 80%; border-radius: 10px; }
         .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
     </style>
@@ -58,8 +50,8 @@
         <label>Seu WhatsApp (DDD + Número)</label>
         <input type="tel" id="whatsappCliente" placeholder="Ex: 31991595612">
 
-        <label>Seu Nome Completo</label>
-        <input type="text" id="nomeCliente" placeholder="Para identificação do pedido">
+        <label>Seu Nome</label>
+        <input type="text" id="nomeCliente" placeholder="Ex: Boneco Bot">
 
         <label>Nome na Camisa</label>
         <input type="text" id="nomeCamisa" placeholder="Ex: Snoop Dogg" oninput="atualizar()">
@@ -118,51 +110,56 @@
 
         async function enviarPedido() {
             const btn = document.getElementById('btnEnviar');
-            const dados = {
-                whatsapp: document.getElementById('whatsappCliente').value.replace(/\D/g, ''),
-                nomeCliente: document.getElementById('nomeCliente').value,
-                camisaNome: document.getElementById('nomeCamisa').value,
-                camisaNum: document.getElementById('numeroCamisa').value,
-                tamanho: document.getElementById('tamanhoCamisa').value
-            };
+            const whatsapp = document.getElementById('whatsappCliente').value.replace(/\D/g, '');
+            const nomeCli = document.getElementById('nomeCliente').value;
+            const camisaNom = document.getElementById('nomeCamisa').value;
+            const camisaNum = document.getElementById('numeroCamisa').value;
+            const tamanho = document.getElementById('tamanhoCamisa').value;
 
-            if (!dados.whatsapp || !dados.nomeCliente || !dados.camisaNome || !dados.camisaNum) {
+            if (!whatsapp || !nomeCli || !camisaNom || !camisaNum) {
                 alert("Por favor, preencha todos os campos!");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "ENVIANDO...";
+            btn.innerText = "ENVIANDO AO SERVIDOR...";
 
-            // Salva no navegador para a próxima página
-            localStorage.setItem('user_whatsapp', dados.whatsapp);
-            localStorage.setItem('pedido_temp', JSON.stringify(dados));
+            // Salva dados locais para a página de pagamento
+            localStorage.setItem('user_whatsapp', whatsapp);
+            localStorage.setItem('pedidoCamisa', JSON.stringify({
+                identificacao: nomeCli,
+                nomeCamisa: camisaNom,
+                numero: camisaNum,
+                tamanho: tamanho
+            }));
 
             try {
-                // Envia para o Google Sheets via Apps Script v2
-                const formData = new FormData();
+                // Prepara os dados exatamente como o Apps Script espera
+                const formData = new URLSearchParams();
                 formData.append('action', 'CREATE_ORDER');
                 formData.append('securityToken', 'TREM123');
-                formData.append('telefone', dados.whatsapp);
-                formData.append('nomeCliente', dados.nomeCliente);
-                formData.append('camisaNome', dados.camisaNome);
-                formData.append('camisaNum', dados.camisaNum);
-                formData.append('tamanho', dados.tamanho);
+                formData.append('telefone', whatsapp);
+                formData.append('nomeCliente', nomeCli);
+                formData.append('camisaNome', camisaNom);
+                formData.append('camisaNum', camisaNum);
+                formData.append('tamanho', tamanho);
                 formData.append('operationId', 'op_' + Date.now());
 
-                // no-cors é necessário para Apps Script
-                await fetch(SCRIPT_URL, { method: 'POST', body: formData, mode: 'no-cors' });
+                // Envia (usando fetch comum com no-cors para evitar erro de redirecionamento do Google)
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
 
-                // Espera um pouco e vai para pagamento
-                setTimeout(() => {
-                    window.location.href = "pagamento.html";
-                }, 800);
+                // Redireciona após o envio
+                window.location.href = "pagamento.html";
 
             } catch (e) {
-                console.error(e);
-                alert("Erro de conexão. Tente novamente.");
-                btn.disabled = false;
-                btn.innerText = "PROSSEGUIR PARA PAGAMENTO";
+                console.error("Erro no envio:", e);
+                alert("Erro ao conectar com a planilha. O pedido será registrado mas pode demorar a aparecer.");
+                window.location.href = "pagamento.html";
             }
         }
     </script>

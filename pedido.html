@@ -1,291 +1,168 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personalizar Camisa - Trem do Ódio EC</title>
+    <title>Trem do Ódio EC - Personalize sua Camisa</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0d0d0d; color: #fff; min-height: 100vh; display: flex; flex-direction: column; padding: 15px; padding-bottom: 100px; }
-        .container { max-width: 400px; margin: 0 auto; width: 100%; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .logo-small { height: 40px; }
-        .step-indicator { font-size: 0.8rem; color: #888; text-align: right; }
-        .preview-area { position: relative; background: #1a1a1a; border-radius: 16px; overflow: hidden; margin-bottom: 20px; aspect-ratio: 3/4; border: 1px solid #333; }
-        .jersey-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .preview-text { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Impact', 'Arial Black', sans-serif; text-transform: uppercase; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.5); white-space: nowrap; pointer-events: none; transition: font-size 0.1s ease; width: 58%; text-align: center; overflow: hidden; }
-        #preview-name { top: 22%; font-size: clamp(1.5rem, 8vw, 3.5rem); letter-spacing: 1px; }
-        #preview-number { top: 36%; font-size: clamp(2.5rem, 12vw, 5.5rem); font-weight: 900; letter-spacing: 2px; }
+        :root { --vermelho: #cc0000; --preto: #000000; --cinza: #1a1a1a; }
+        body { font-family: 'Arial', sans-serif; background-color: var(--preto); color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: var(--vermelho); font-size: 18px; text-transform: uppercase; margin: 15px 0; text-align: center; font-family: 'Impact', sans-serif; letter-spacing: 1px; }
         
-        .form-section { background: #1a1a1a; border: 1px solid #333; border-radius: 16px; padding: 20px; margin-bottom: 15px; }
-        .form-section h3 { font-size: 1rem; color: #ff6b00; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 8px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; color: #ccc; margin-bottom: 6px; font-weight: 500; }
-        input[type="text"], input[type="tel"], select { width: 100%; background: #0d0d0d; border: 1px solid #333; border-radius: 8px; padding: 14px; color: #fff; font-size: 1rem; outline: none; transition: border-color 0.2s; }
-        input:focus, select:focus { border-color: #ff6b00; }
-        input::placeholder { color: #666; }
-        .size-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .size-btn { background: #0d0d0d; border: 2px solid #333; color: #fff; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
-        .size-btn.selected { border-color: #ff6b00; background: rgba(255, 107, 0, 0.1); color: #ff6b00; }
-        .size-btn:active { transform: scale(0.95); }
+        /* PREVIEW LADO A LADO */
+        .preview-container { display: flex; flex-direction: row; gap: 10px; justify-content: center; width: 100%; max-width: 500px; }
+        .camisa-box { position: relative; width: 48%; background-color: var(--cinza); border-radius: 8px; border: 1px solid #333; }
+        .camisa-img { width: 100%; display: block; border-radius: 8px; }
+
+        /* NOME NAS COSTAS */
+        .txt-nome-container { position: absolute; top: 22%; left: 50%; transform: translateX(-50%); width: 58%; height: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        #displayNome { font-family: 'Impact', sans-serif; color: #ffffff; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); white-space: nowrap; font-size: 22px; }
+
+        /* NÚMERO NAS COSTAS */
+        .txt-numero { position: absolute; top: 36%; left: 50%; transform: translateX(-50%); font-family: 'Impact', sans-serif; font-size: 50px; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
+
+        .form-area { background: var(--cinza); padding: 20px; border-radius: 15px; width: 95%; max-width: 400px; margin-top: 20px; border-top: 4px solid var(--vermelho); box-sizing: border-box; margin-bottom: 30px; }
+        label { display: block; text-align: left; margin: 12px 0 5px; font-size: 11px; color: #ff9999; font-weight: bold; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 14px; }
+
+        .tamanho-wrapper { display: flex; gap: 10px; align-items: center; }
+        .btn-info { background: #444; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { max-width: 90%; max-height: 90%; background: #1a1a1a; border-radius: 12px; overflow: hidden; border: 1px solid #333; }
-        .modal-img { width: 100%; display: block; }
-        .close-modal { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem; color: #000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        button.btn-proximo { width: 100%; padding: 15px; background: var(--vermelho); color: white; border: none; font-size: 18px; font-weight: bold; border-radius: 5px; margin-top: 20px; text-transform: uppercase; cursor: pointer; }
+        button:disabled { background: #666; cursor: not-allowed; }
 
-        .btn-continue { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 30px); max-width: 400px; padding: 18px; background: linear-gradient(135deg, #ff6b00, #e65a00); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(255, 107, 0, 0.4); z-index: 50; transition: opacity 0.2s, transform 0.1s; }
-        .btn-continue:active { transform: translateX(-50%) scale(0.98); }
-        .btn-continue:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-continue.loading { background: #333; box-shadow: none; }
-
-        .error-msg { background: #3a1a1a; border: 1px solid #ff4444; color: #ff8888; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; display: none; }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        .modal-content { max-width: 90%; max-height: 80%; border-radius: 10px; }
+        .legenda { font-size: 10px; color: #888; margin: 5px 0; text-align: center; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <img src="Logo.png" alt="Logo" class="logo-small">
-            <div class="step-indicator">Etapa 1 de 2</div>
-        </header>
 
-        <!-- Área de Preview -->
-        <div class="preview-area">
-            <img src="camisa_base.png" alt="Base da Camisa" class="jersey-img" id="jersey-img">
-            <div class="preview-text" id="preview-name" style="top: 22%;">SNOOP DOGG</div>
-            <div class="preview-text" id="preview-number" style="top: 36%;">99</div>
+    <h1>Personalize sua Camisa</h1>
+
+    <div class="preview-container">
+        <div class="camisa-box">
+            <p class="legenda">FRENTE</p>
+            <img src="Frente.png" class="camisa-img">
         </div>
-
-        <!-- Alerta de Erro -->
-        <div class="error-msg" id="error-msg"></div>
-
-        <!-- Formulário -->
-        <form id="form-pedido">
-            <div class="form-section">
-                <h3>👤 Seus Dados</h3>
-                <div class="form-group">
-                    <label for="input-nome">Seu Nome Completo</label>
-                    <input type="text" id="input-nome" placeholder="Ex: João da Silva" required autocomplete="name">
-                </div>
-                <div class="form-group">
-                    <label for="input-whatsapp">WhatsApp com DDD</label>
-                    <input type="tel" id="input-whatsapp" placeholder="Ex: 31999999999" required autocomplete="tel" inputmode="numeric">
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h3>🎽 Personalização</h3>
-                <div class="form-group">
-                    <label for="input-camisa-nome">Nome na Camisa (Máx. 12 chars)</label>
-                    <input type="text" id="input-camisa-nome" maxlength="12" placeholder="Ex: SNOOP DOGG" style="text-transform: uppercase;" required>
-                </div>
-                <div class="form-group">
-                    <label for="input-camisa-numero">Número (2 dígitos)</label>
-                    <input type="text" id="input-camisa-numero" maxlength="2" placeholder="99" required inputmode="numeric" pattern="[0-9]{2}">
-                </div>
-                <div class="form-group">
-                    <label>Tamanho</label>
-                    <div class="size-selector" id="size-selector">
-                        <button type="button" class="size-btn" data-size="P">P</button>
-                        <button type="button" class="size-btn" data-size="M">M</button>
-                        <button type="button" class="size-btn selected" data-size="G">G</button>
-                        <button type="button" class="size-btn" data-size="GG">GG</button>
-                        <button type="button" class="size-btn" data-size="XG">XG</button>
-                    </div>
-                    <button type="button" class="size-btn" id="btn-tabela-tamanhos" style="margin-top: 10px; background: #222; border-color: #444; color: #aaa; font-size: 0.85rem;">Ver Tabela de Medidas</button>
-                </div>
-            </div>
-        </form>
-
-        <!-- Botão Fixed Bottom -->
-        <button class="btn-continue" id="btn-continue">Ir para Pagamento</button>
+        <div class="camisa-box">
+            <p class="legenda">COSTAS</p>
+            <img src="Costas.png" class="camisa-img">
+            <div class="txt-nome-container"><span id="displayNome">SNOOP DOGG</span></div>
+            <div id="displayNumero" class="txt-numero">99</div>
+        </div>
     </div>
 
-    <!-- Modal Tabela de Tamanhos -->
-    <div class="modal-overlay" id="modal-tamanhos">
-        <div class="modal-content">
-            <img src="Tamanho.png" alt="Tabela de Tamanhos" class="modal-img">
+    <div class="form-area">
+        <label>Seu WhatsApp (DDD + Número)</label>
+        <input type="tel" id="whatsappCliente" placeholder="Ex: 31991595612">
+
+        <label>Seu Nome Completo</label>
+        <input type="text" id="nomeCliente" placeholder="Para identificação do pedido">
+
+        <label>Nome na Camisa</label>
+        <input type="text" id="nomeCamisa" placeholder="Ex: Snoop Dogg" oninput="atualizar()">
+        
+        <label>Número (00-99)</label>
+        <input type="number" id="numeroCamisa" placeholder="99" oninput="validarNumero()">
+
+        <label>Tamanho</label>
+        <div class="tamanho-wrapper">
+            <select id="tamanhoCamisa">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+                <option value="XG">XG</option>
+            </select>
+            <button class="btn-info" onclick="abrirModal()">i</button>
         </div>
-        <div class="close-modal" id="close-modal">×</div>
+        
+        <button class="btn-proximo" id="btnEnviar" onclick="enviarPedido()">PROSSEGUIR PARA PAGAMENTO</button>
+    </div>
+
+    <div id="modalTamanho" class="modal" onclick="fecharModal()">
+        <img src="Tamanho.png" class="modal-content">
     </div>
 
     <script>
-        // ========== CONFIGURAÇÃO ==========
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec'; // COLE AQUI A URL DO PASSO 2
-        const SECURITY_TOKEN = 'TREM123'; // Deve ser igual ao do Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
 
-        // ========== ESTADO & ELEMENTOS ==========
-        const state = {
-            nome: '', whatsapp: '', camisaNome: 'SNOOP DOGG', camisaNumero: '99', tamanho: 'G'
-        };
-        const els = {
-            previewName: document.getElementById('preview-name'),
-            previewNumber: document.getElementById('preview-number'),
-            inputNome: document.getElementById('input-nome'),
-            inputWhatsapp: document.getElementById('input-whatsapp'),
-            inputCamisaNome: document.getElementById('input-camisa-nome'),
-            inputCamisaNumero: document.getElementById('input-camisa-numero'),
-            sizeBtns: document.querySelectorAll('.size-btn[data-size]'),
-            btnContinue: document.getElementById('btn-continue'),
-            errorMsg: document.getElementById('error-msg'),
-            modal: document.getElementById('modal-tamanhos'),
-            btnTabela: document.getElementById('btn-tabela-tamanhos'),
-            closeModal: document.getElementById('close-modal')
-        };
-
-        // ========== INICIALIZAÇÃO ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFromStorage();
-            bindEvents();
-            renderPreview();
-            updateSizeButtons();
-        });
-
-        // ========== LOCALSTORAGE ==========
-        function loadFromStorage() {
-            state.nome = localStorage.getItem('nome_cliente') || '';
-            state.whatsapp = localStorage.getItem('whatsapp_cliente') || '';
-            state.camisaNome = localStorage.getItem('nome_camisa') || 'SNOOP DOGG';
-            state.camisaNumero = localStorage.getItem('numero_camisa') || '99';
-            state.tamanho = localStorage.getItem('tamanho_selecionado') || 'G';
-
-            els.inputNome.value = state.nome;
-            els.inputWhatsapp.value = state.whatsapp;
-            els.inputCamisaNome.value = state.camisaNome;
-            els.inputCamisaNumero.value = state.camisaNumero;
-        }
-        function saveToStorage() {
-            localStorage.setItem('nome_cliente', state.nome);
-            localStorage.setItem('whatsapp_cliente', state.whatsapp);
-            localStorage.setItem('nome_camisa', state.camisaNome);
-            localStorage.setItem('numero_camisa', state.camisaNumero);
-            localStorage.setItem('tamanho_selecionado', state.tamanho);
+        function validarNumero() {
+            let campo = document.getElementById('numeroCamisa');
+            if (campo.value.length > 2) campo.value = campo.value.slice(0, 2);
+            atualizar();
         }
 
-        // ========== PREVIEW ==========
-        function renderPreview() {
-            // Nome: escala dinâmica para caber em 58%
-            const name = state.camisaNome || 'SEU NOME';
-            els.previewName.textContent = name;
-            
-            // Lógica de escala (simplificada para performance mobile)
-            // O CSS `width: 58%` + `clamp` já faz 90% do trabalho.
-            // Apenas forçamos recálculo se estourar (fallback JS).
-            const maxWidth = els.previewName.parentElement.offsetWidth * 0.58;
-            if (els.previewName.scrollWidth > maxWidth) {
-                const ratio = maxWidth / els.previewName.scrollWidth;
-                const currentSize = parseFloat(window.getComputedStyle(els.previewName).fontSize);
-                els.previewName.style.fontSize = `${Math.max(currentSize * ratio * 0.95, 16)}px`;
-            } else {
-                els.previewName.style.fontSize = ''; // Volta pro CSS clamp
+        function atualizar() {
+            let nomeInput = document.getElementById('nomeCamisa').value;
+            let numInput = document.getElementById('numeroCamisa').value;
+            const displayNome = document.getElementById('displayNome');
+            const displayNumero = document.getElementById('displayNumero');
+            const container = document.querySelector('.txt-nome-container');
+
+            displayNumero.innerText = numInput === "" ? "99" : numInput.toString().padStart(2, '0');
+            displayNome.innerText = (nomeInput || "SNOOP DOGG").toUpperCase();
+
+            let fontSize = 22; 
+            displayNome.style.fontSize = fontSize + "px";
+            while (displayNome.scrollWidth > container.offsetWidth && fontSize > 8) {
+                fontSize--;
+                displayNome.style.fontSize = fontSize + "px";
             }
-
-            // Número: Garante 2 dígitos
-            let num = state.camisaNumero.replace(/\D/g, '').slice(0, 2);
-            if (num.length === 1) num = '0' + num;
-            els.previewNumber.textContent = num || '99';
         }
 
-        // ========== EVENTOS ==========
-        function bindEvents() {
-            // Inputs de Texto
-            els.inputNome.addEventListener('input', e => { state.nome = e.target.value.trim(); saveToStorage(); });
-            els.inputWhatsapp.addEventListener('input', e => { state.whatsapp = e.target.value.replace(/\D/g, ''); saveToStorage(); });
-            
-            els.inputCamisaNome.addEventListener('input', e => { 
-                state.camisaNome = e.target.value.toUpperCase().slice(0, 12); 
-                els.inputCamisaNome.value = state.camisaNome; 
-                saveToStorage(); renderPreview(); 
-            });
-            
-            els.inputCamisaNumero.addEventListener('input', e => { 
-                state.camisaNumero = e.target.value.replace(/\D/g, '').slice(0, 2); 
-                els.inputCamisaNumero.value = state.camisaNumero; 
-                saveToStorage(); renderPreview(); 
-            });
+        function abrirModal() { document.getElementById('modalTamanho').style.display = "flex"; }
+        function fecharModal() { document.getElementById('modalTamanho').style.display = "none"; }
 
-            // Botões de Tamanho
-            els.sizeBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    state.tamanho = btn.dataset.size;
-                    saveToStorage(); updateSizeButtons();
-                });
-            });
-
-            // Modal Tabela
-            els.btnTabela.addEventListener('click', () => els.modal.classList.add('active'));
-            els.closeModal.addEventListener('click', () => els.modal.classList.remove('active'));
-            els.modal.addEventListener('click', (e) => { if (e.target === els.modal) els.modal.classList.remove('active'); });
-
-            // Botão Principal - SALVAR NO SERVIDOR
-            els.btnContinue.addEventListener('click', handleSaveOrder);
-        }
-
-        function updateSizeButtons() {
-            els.sizeBtns.forEach(btn => btn.classList.toggle('selected', btn.dataset.size === state.tamanho));
-        }
-
-        function showError(msg) {
-            els.errorMsg.textContent = msg;
-            els.errorMsg.style.display = 'block';
-        }
-        function hideError() { els.errorMsg.style.display = 'none'; }
-
-        function setLoading(isLoading) {
-            els.btnContinue.disabled = isLoading;
-            els.btnContinue.classList.toggle('loading', isLoading);
-            els.btnContinue.textContent = isLoading ? 'Salvando Pedido...' : 'Ir para Pagamento';
-        }
-
-        // ========== LÓGICA PRINCIPAL: SALVAR PEDIDO ==========
-        async function handleSaveOrder() {
-            hideError();
-
-            // 1. Validação Client-Side
-            if (!state.nome || state.nome.split(' ').length < 2) return showError('Informe seu nome completo.');
-            if (state.whatsapp.length < 10 || state.whatsapp.length > 11) return showError('WhatsApp inválido. Use DDD + Número.');
-            if (!state.camisaNome) return showError('Informe o nome para a camisa.');
-            if (state.camisaNumero.length !== 2) return showError('O número deve ter exatamente 2 dígitos.');
-
-            setLoading(true);
-
-            // 2. Prepara Payload
-            // Gera ID de operação para idempotência (evita duplicado se clicar 2x rápido)
-            const operationId = 'op_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-            
-            const payload = {
-                action: 'CREATE_ORDER',
-                securityToken: SECURITY_TOKEN,
-                operationId: operationId, // Chave para idempotência no servidor
-                nome: state.nome,
-                whatsapp: state.whatsapp,
-                camisaNome: state.camisaNome,
-                camisaNumero: state.camisaNumero,
-                tamanho: state.tamanho
+        async function enviarPedido() {
+            const btn = document.getElementById('btnEnviar');
+            const dados = {
+                whatsapp: document.getElementById('whatsappCliente').value.replace(/\D/g, ''),
+                nomeCliente: document.getElementById('nomeCliente').value,
+                camisaNome: document.getElementById('nomeCamisa').value,
+                camisaNum: document.getElementById('numeroCamisa').value,
+                tamanho: document.getElementById('tamanhoCamisa').value
             };
 
+            if (!dados.whatsapp || !dados.nomeCliente || !dados.camisaNome || !dados.camisaNum) {
+                alert("Por favor, preencha todos os campos!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "ENVIANDO...";
+
+            // Salva no navegador para a próxima página
+            localStorage.setItem('user_whatsapp', dados.whatsapp);
+            localStorage.setItem('pedido_temp', JSON.stringify(dados));
+
             try {
-                // 3. Envia para Apps Script (no-cors = não lê resposta, mas garante envio)
-                await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Necessário para Apps Script Web App público
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                // Envia para o Google Sheets via Apps Script v2
+                const formData = new FormData();
+                formData.append('action', 'CREATE_ORDER');
+                formData.append('securityToken', 'TREM123');
+                formData.append('telefone', dados.whatsapp);
+                formData.append('nomeCliente', dados.nomeCliente);
+                formData.append('camisaNome', dados.camisaNome);
+                formData.append('camisaNum', dados.camisaNum);
+                formData.append('tamanho', dados.tamanho);
+                formData.append('operationId', 'op_' + Date.now());
 
-                // 4. Sucesso presumido (no-cors não deixa ler response)
-                // A página de pagamento fará a verificação real (GET_ORDER) ao carregar.
-                // Limpamos flags de "pedido antigo" para não confundir a próxima tela.
-                localStorage.removeItem('pedido_confirmado_id'); 
-                localStorage.setItem('pedido_pendente_whatsapp', state.whatsapp); // Flag para pagamento.html saber que deve consultar
-                
-                window.location.href = 'pagamento.html';
+                // no-cors é necessário para Apps Script
+                await fetch(SCRIPT_URL, { method: 'POST', body: formData, mode: 'no-cors' });
 
-            } catch (err) {
-                console.error(err);
-                showError('Erro de conexão. Verifique a internet e tente novamente.');
-                setLoading(false);
+                // Espera um pouco e vai para pagamento
+                setTimeout(() => {
+                    window.location.href = "pagamento.html";
+                }, 800);
+
+            } catch (e) {
+                console.error(e);
+                alert("Erro de conexão. Tente novamente.");
+                btn.disabled = false;
+                btn.innerText = "PROSSEGUIR PARA PAGAMENTO";
             }
         }
     </script>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camisa do Time - Pro Clubs</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #121212; color: white; text-align: center; padding: 20px; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 20px; }
+        
+        /* Área das Camisas */
+        .camisa-box { position: relative; width: 350px; }
+        .camisa-img { width: 100%; border-radius: 10px; }
+
+        /* Ajuste do Nome e Número - MEXA AQUI DEPOIS */
+        .txt-nome {
+            position: absolute;
+            top: 22%; /* Distância do topo */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .txt-numero {
+            position: absolute;
+            top: 35%; /* Distância do topo */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 100px;
+            font-weight: bold;
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        /* Formulário */
+        .form-area { background: #1e1e1e; padding: 20px; border-radius: 15px; max-width: 400px; margin: 20px auto; }
+        input, select { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #333; }
+        button { width: 95%; padding: 15px; background: #25d366; color: white; border: none; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #128c7e; }
+    </style>
+</head>
+<body>
+
+    <h1>Personalize seu Manto</h1>
+
+    <div class="container">
+        <!-- Frente -->
+        <div class="camisa-box">
+            <p>FRENTE</p>
+            <img src="frente.png" class="camisa-img" alt="Frente da Camisa">
+        </div>
+
+        <!-- Costas -->
+        <div class="camisa-box">
+            <p>COSTAS</p>
+            <img src="costas.png" class="camisa-img" alt="Costas da Camisa">
+            <div id="displayNome" class="txt-nome">NOME</div>
+            <div id="displayNumero" class="txt-numero">00</div>
+        </div>
+    </div>
+
+    <div class="form-area">
+        <input type="text" id="nomePessoa" placeholder="Seu nome completo">
+        <input type="text" id="nomeCamisa" placeholder="Nome na camisa" maxlength="15" oninput="atualizar()">
+        <input type="number" id="numeroCamisa" placeholder="Número" oninput="atualizar()">
+        
+        <select id="pagamento">
+            <option value="50">Pagar Metade (R$ 50,00)</option>
+            <option value="100">Pagar Total (R$ 100,00)</option>
+        </select>
+
+        <button onclick="concluir()">CONCLUIR PEDIDO</button>
+    </div>
+
+    <script>
+        function atualizar() {
+            let nome = document.getElementById('nomeCamisa').value;
+            let num = document.getElementById('numeroCamisa').value;
+            
+            document.getElementById('displayNome').innerText = nome.toUpperCase();
+            document.getElementById('displayNumero').innerText = num;
+        }
+
+        function concluir() {
+            // Essa parte vamos configurar depois (Planilha e PIX)
+            alert("Pedido registrado! Vamos para o pagamento...");
+        }
+    </script>
+</body>
+</html>

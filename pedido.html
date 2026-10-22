@@ -20,6 +20,7 @@ label{display:block;margin:12px 0 5px;font-size:11px;color:#ff9999;font-weight:b
 input,select{width:100%;padding:12px;border-radius:5px;border:1px solid #444;background:#000;color:#fff;font-size:14px;box-sizing:border-box}
 button.prox{width:100%;padding:15px;background:var(--vermelho);color:#fff;border:none;border-radius:5px;margin-top:20px;font-size:18px;font-weight:bold;text-transform:uppercase;cursor:pointer}
 button:disabled{background:#666;cursor:not-allowed}
+.status-msg{margin-top:12px;font-size:12px;color:#ff0}
 </style>
 </head>
 <body>
@@ -59,19 +60,18 @@ button:disabled{background:#666;cursor:not-allowed}
     <button class="prox" id="btnEnviar" onclick="enviarPedido()">PROSSEGUIR PARA PAGAMENTO</button>
 </div>
 
-<div id="modalTamanho" class="modal" onclick="fecharModalExterno(event)">
-    <span class="modal-close" onclick="fecharModal()">&times;</span>
-    <img src="Tamanho.png" class="modal-content" id="imgModal">
-</div>
-
 <script>
-/* ---------- CONFIGURAÇÕES ---------- */
+/* -------------------------------------------------
+   CONFIGURAÇÕES
+------------------------------------------------- */
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
 
-/* ---------- FUNÇÕES DE UI ---------- */
+/* -------------------------------------------------
+   UI – preview da camisa
+------------------------------------------------- */
 function validarNumero(){
-    const c=document.getElementById('numeroCamisa');
-    if(c.value.length>2) c.value=c.value.slice(0,2);
+    const el=document.getElementById('numeroCamisa');
+    if(el.value.length>2) el.value=el.value.slice(0,2);
     atualizar();
 }
 function atualizar(){
@@ -80,75 +80,109 @@ function atualizar(){
     const dNome=document.getElementById('displayNome');
     const dNum=document.getElementById('displayNumero');
     const container=document.querySelector('.txt-nome');
-    dNum.innerText = num==="" ? "99" : num.toString().padStart(2,'0');
+
+    dNum.innerText = num==='' ? "99" : num.padStart(2,'0');
     dNome.innerText = (nome || "SNOOP DOGG").toUpperCase();
+
+    // ajuste de fonte para caber
     let fs=22;
     dNome.style.fontSize=fs+'px';
-    while(dNome.scrollWidth > container.offsetWidth && fs>8){
+    while(dNome.scrollWidth>container.offsetWidth && fs>8){
         fs--; dNome.style.fontSize=fs+'px';
     }
 }
 
-/* ---------- ENVIO DO PEDIDO ---------- */
+/* -------------------------------------------------
+   ENVIO DO PEDIDO
+------------------------------------------------- */
 async function enviarPedido(){
-    const btn=document.getElementById('btnEnviar');
-    const whatsapp=document.getElementById('whatsappCliente').value.replace(/\D/g,'');
-    const nomeCli=document.getElementById('nomeCliente').value.trim();
-    const camisaNom=document.getElementById('nomeCamisa').value.trim();
-    const camisaNum=document.getElementById('numeroCamisa').value.trim();
-    const tamanho=document.getElementById('tamanhoCamisa').value;
+    const status = document.getElementById('statusMsg');
+    const btn    = document.getElementById('btnEnviar');
+
+    const whatsapp = document.getElementById('whatsappCliente').value.replace(/\D/g,'');
+    const nomeCli = document.getElementById('nomeCliente').value.trim();
+    const camisaNom = document.getElementById('nomeCamisa').value.trim();
+    const camisaNum = document.getElementById('numeroCamisa').value.trim();
+    const tamanho   = document.getElementById('tamanhoCamisa').value;
 
     if(!whatsapp || !nomeCli || !camisaNom || !camisaNum){
-        alert('Preencha todos os campos!'); return;
-    }
-
-    btn.disabled=true;
-    btn.innerText='Enviando dados...';
-
-    // Verifica se já existe pedido para este WhatsApp
-    const existing = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'GET_ORDER', whatsapp: whatsapp })
-    }).then(r=>r.json()).catch(()=>null);
-
-    if (existing && existing.status === 'success') {
-        // Já existe → usa os dados já salvos
-        localStorage.setItem('user_whatsapp', whatsapp);
-        window.location.href = 'pagamento.html';
+        alert('Preencha todos os campos!');
         return;
     }
 
-    // Caso não exista, cria novo pedido
-    localStorage.setItem('user_whatsapp', whatsapp);
-    localStorage.setItem('pedCamisa', JSON.stringify({
-        identificacao: nomeCli,
-        nomeCamisa: camisaNom,
-        numero: camisaNum,
-        tamanho: tamanho
-    }));
+    // -------------------------------------------------
+    // 1️⃣ Mostra “Procurando partida…”
+    // -------------------------------------------------
+    btn.disabled = true;
+    btn.innerText = 'Procurando partida…';
+    status.innerText = '';
 
+    // -------------------------------------------------
+    // 2️⃣ Verifica se já existe pedido para esse WhatsApp
+    // -------------------------------------------------
+    try{
+        const resp = await fetch(SCRIPT_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({action:'GET_ORDER', whatsapp})
+        });
+        const data = await resp.json();
+
+        if(data.status==='success'){
+            // Já tem registro → nada a criar, só avançar
+            localStorage.setItem('user_whatsapp', whatsapp);
+            btn.innerText = 'Partida encontrada!';
+            setTimeout(()=>window.location.href='pagamento.html',700);
+            return;
+        }
+    }catch(e){
+        console.error('GET_ORDER falhou',e);
+        // continua para criar (pode ser “pedido ainda não existe”)
+    }
+
+    // -------------------------------------------------
+    // 3️⃣ Cria novo pedido
+    // -------------------------------------------------
     const payload = {
         action: 'CREATE_ORDER',
-        whatsapp: whatsapp,
+        whatsapp,
         nome: nomeCli,
         camisaNome: camisaNom,
         camisaNumero: camisaNum,
-        tamanho: tamanho
+        tamanho
     };
 
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+    try{
+        await fetch(SCRIPT_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
         });
-        btn.disabled=false;
-        btn.innerText='Partida encontrada!';
-        setTimeout(()=> window.location.href='pagamento.html', 500);
-    } catch (e) {
-        btn.disabled=false;
-        btn.innerText='Falha ao conectar ao servidor';
+
+        // -------------------------------------------------
+        // 4️⃣ Salva no localStorage (usado na tela de pagamento)
+        // -------------------------------------------------
+        localStorage.setItem('user_whatsapp', whatsapp);
+        localStorage.setItem('pedCamisa', JSON.stringify({
+            identificacao: nomeCli,
+            nomeCamisa: camisaNom,
+            numero: camisaNum,
+            tamanho
+        }));
+
+        // -------------------------------------------------
+        // 5️⃣ UI de sucesso + redirecionamento
+        // -------------------------------------------------
+        btn.innerText = 'Partida encontrada!';
+        status.style.color = '#0f0';
+        status.innerText = 'Pedido registrado com sucesso.';
+        setTimeout(()=>window.location.href='pagamento.html',700);
+    }catch(e){
+        console.error('CREATE_ORDER falhou',e);
+        btn.disabled = false;
+        btn.innerText = 'PROSSEGUIR PARA PAGAMENTO';
+        status.style.color = '#f00';
+        status.innerText = 'Falha ao conectar ao servidor. Tente novamente.';
     }
 }
 </script>

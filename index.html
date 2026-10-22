@@ -1,36 +1,87 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trem do Ódio EC - Oficial</title>
-    <!-- Configurações de Compartilhamento (Link Bonito) -->
-<meta property="og:title" content="Trem do Ódio EC - Camisa Oficial 2026">
-<meta property="og:description" content="Personalize sua camisa com seu nome e número. Garanta já a sua!">
-<meta property="og:url" content="https://jordanmoraes22.github.io/camisa-time/">
-<meta property="og:image" content="https://jordanmoraes22.github.io/camisa-time/Logo.png">
-<meta property="og:type" content="website">
-<meta name="theme-color" content="#cc0000">
+    <title>Trem do Ódio EC - Camisas Oficiais</title>
+    <meta property="og:title" content="Trem do Ódio EC - Camisas Oficiais">
+    <meta property="og:description" content="Garanta sua camisa personalizada do Trem do Ódio EC. Prazo de fabricação: 30 dias.">
+    <meta property="og:image" content="Logo.png">
+    <meta property="og:url" content="https://jordanmoraes22.github.io/camisa-time/">
     <style>
-        :root { --vermelho: #cc0000; --preto: #000000; --cinza: #1a1a1a; }
-        body { font-family: 'Impact', sans-serif; background: var(--preto); color: white; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 20px; }
-        .logo { max-width: 220px; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(204, 0, 0, 0.4)); }
-        .btn-main { width: 100%; max-width: 300px; padding: 20px; margin: 10px 0; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 18px; transition: 0.3s; text-decoration: none; display: inline-block; }
-        .btn-pedido { background: var(--vermelho); color: white; }
-        .btn-restante { background: #333; color: white; border: 1px solid #555; }
-        .prazo-info { margin-top: 30px; font-family: 'Arial', sans-serif; font-size: 14px; color: #888; border-top: 1px solid #333; padding-top: 20px; line-height: 1.6; }
-        .dias-counter { color: var(--vermelho); font-weight: bold; font-size: 22px; display: block; margin-top: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #0d0d0d; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { width: 100%; max-width: 400px; text-align: center; }
+        .logo { width: 100%; max-width: 280px; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+        h1 { font-weight: 700; font-size: 1.5rem; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; line-height: 1.4; }
+        .btn { display: block; width: 100%; padding: 18px; border-radius: 12px; font-size: 1.1rem; font-weight: 700; text-decoration: none; text-align: center; transition: transform 0.1s, filter 0.2s; border: none; cursor: pointer; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: linear-gradient(135deg, #ff6b00, #e65a00); color: #fff; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4); }
+        .btn-secondary { background: #1a1a1a; color: #fff; border: 1px solid #333; margin-bottom: 30px; }
+        .btn-secondary:active { background: #2a2a2a; }
+        .info-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 15px; margin-bottom: 30px; font-size: 0.85rem; color: #ccc; text-align: left; }
+        .info-box strong { color: #ff6b00; display: block; margin-bottom: 5px; text-align: center; }
+        .support-btn { background: #25D366; color: #fff; width: 100%; }
+        .support-btn:active { background: #1ebd5a; }
+        .footer-note { font-size: 0.75rem; color: #555; margin-top: auto; padding-bottom: 20px; }
     </style>
 </head>
 <body>
-    <img src="Logo.png" alt="Trem do Ódio EC" class="logo">
-    <a href="pedido.html" class="btn-main btn-pedido">Quero pedir minha camisa</a>
-    <a href="pagamento.html?fluxo=restante" class="btn-main btn-restante">Pagar valor restante</a>
+    <div class="container">
+        <img src="Logo.png" alt="Trem do Ódio EC" class="logo">
+        <h1>Camisa Oficial 2024</h1>
+        <p class="subtitle">Personalize seu nome, número e tamanho. Pagamento via PIX.</p>
 
-    <div class="prazo-info">
-        Previsão para entrega (após pedido ao fornecedor):
-        <span class="dias-counter">Faltam 30 dias</span>
-        <small>Confecção em 30 dias corridos</small>
+        <button class="btn btn-primary" id="btn-novo-pedido">Quero Pedir Minha Camisa</button>
+        <button class="btn btn-secondary" id="btn-pagar-restante">Pagar Valor Restante</button>
+
+        <div class="info-box">
+            <strong>⏳ PRAZO DE FABRICAÇÃO: 30 DIAS ÚTEIS</strong>
+            Após a confirmação do pagamento (total ou parcial), sua camisa entra na fila de produção. O prazo começa a contar a partir da data de confirmação financeira.
+        </div>
+
+        <a href="https://wa.me/5531991595612?text=Olá! Tenho dúvidas sobre a camisa do Trem do Ódio EC." target="_blank" class="btn support-btn">Tenho dúvidas / Falar no WhatsApp</a>
+
+        <p class="footer-note">Trem do Ódio EC • Todos os direitos reservados</p>
     </div>
+
+    <script>
+        // CONFIGURAÇÃO - COLE SUA URL DO APPS SCRIPT AQUI
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxj4MLJomXHbuuMYxJPEyd2mtoZcLANLjtkxCmNDcCQQFegveL6atlWm79qjSa-KwsZPA/exec';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnNovo = document.getElementById('btn-novo-pedido');
+            const btnPagar = document.getElementById('btn-pagar-restante');
+
+            // 1. NOVO PEDIDO -> Limpa sessão antiga e vai para pedido.html
+            btnNovo.addEventListener('click', () => {
+                // Limpa apenas dados de personalização, mantém o whatsapp se quiser (opcional)
+                const keysToKeep = []; // Se quiser manter o whatsapp, adicione 'user_whatsapp' aqui
+                Object.keys(localStorage).forEach(key => {
+                    if (!keysToKeep.includes(key)) localStorage.removeItem(key);
+                });
+                window.location.href = 'pedido.html';
+            });
+
+            // 2. PAGAR VALOR RESTANTE -> Pergunta WhatsApp, valida, salva e vai para pagamento.html?modo=consulta
+            btnPagar.addEventListener('click', async () => {
+                const tel = prompt('Digite seu WhatsApp com DDD (ex: 31999999999) para consultar seu pedido:');
+                if (!tel) return;
+
+                const cleanTel = tel.replace(/\D/g, '');
+                if (cleanTel.length < 10 || cleanTel.length > 11) {
+                    alert('Número inválido. Verifique o DDD e o número.');
+                    return;
+                }
+
+                // Salva o telefone normalizado para a página de pagamento usar
+                localStorage.setItem('user_whatsapp', cleanTel);
+                
+                // Redireciona com flag de consulta
+                window.location.href = 'pagamento.html?modo=consulta';
+            });
+        });
+    </script>
 </body>
 </html>

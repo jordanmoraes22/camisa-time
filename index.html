@@ -57,11 +57,17 @@
 
 <img src="Logo.png" alt="Logo Trem do Ódio EC" class="logo">
 <h1>TREM DO ÓDIO EC</h1>
+<!-- Procure os botões no seu index.html e substitua por estes -->
 
-<button class="btn btn-pedir" onclick="novoPedido()">QUERO PEDIR MINHA CAMISA</button>
-<button class="btn btn-restante" onclick="abrirModalZap()">Pagar valor restante / Informar pagamento</button>
+<button class="btn" style="background:#444; cursor:not-allowed;" disabled>
+    LOTE ENCERRADO (25/10)
+</button>
 
-<p class="aviso">Prazo de fabricação: 30 dias após confirmação do pagamento.</p>
+<button class="btn btn-restante" onclick="abrirModalZap()" style="background: #cc0000; border:none;">
+    ACOMPANHAR PRODUÇÃO / PAGAR VALOR RESTANTE
+</button>
+
+<p class="aviso">O lote atual está em fabricação. Previsão de entrega: 26/11.</p>
 
 <a href="https://wa.me/5531991595612?text=Olá! Tenho dúvidas sobre a camisa do Trem do Ódio EC."
    target="_blank" class="whats">Tenho dúvidas / Falar no WhatsApp</a>

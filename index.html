@@ -1,111 +1,35 @@
 <!DOCTYPE html>
-<html lang="pt-BR" prefix="og: http://ogp.me/ns#"> <!-- Adicionado o prefixo og -->
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Trem do Ódio EC – Camisas Oficiais</title>
+<title>Trem do Ódio – Lote Encerrado</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<!-- 1. Meta Tags Principais -->
-<meta name="description" content="Personalize e compre a camisa oficial do Trem do Ódio EC.">
-<link rel="canonical" href="https://jordanmoraes22.github.io/camisa-time/" />
-
-<!-- 2. Fallback para o Google/WhatsApp (Esquema antigo que eles ainda amam) -->
-<meta itemprop="name" content="Trem do Ódio EC – Camisas Oficiais">
-<meta itemprop="description" content="Personalize e compre a camisa oficial do Trem do Ódio EC.">
-<meta itemprop="image" content="https://jordanmoraes22.github.io/camisa-time/Logo.png">
-
-<!-- 3. Open Graph (Facebook/WhatsApp Novo) -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://jordanmoraes22.github.io/camisa-time/">
-<meta property="og:title" content="Trem do Ódio EC – Camisas Oficiais">
-<meta property="og:description" content="Personalize e compre a camisa oficial do Trem do Ódio EC.">
-<meta property="og:image" content="https://jordanmoraes22.github.io/camisa-time/Logo.png">
-<meta property="og:image:secure_url" content="https://jordanmoraes22.github.io/camisa-time/Logo.png">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-
-<!-- 4. Twitter (Para garantir o card grande) -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Trem do Ódio EC – Camisas Oficiais">
-<meta name="twitter:description" content="Personalize e compre a camisa oficial do Trem do Ódio EC.">
-<meta name="twitter:image" content="https://jordanmoraes22.github.io/camisa-time/Logo.png">
-
-<!-- FAVICON (OPCIONAL, MAS BOM PARA CREDIBILIDADE) -->
-<link rel="icon" href="Logo.png" type="image/png">
-
-<!-- ===== SEU CSS ORIGINAL ===== -->
+<link rel="icon" href="Logo.png">
 <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-    body{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;padding:20px;text-align:center}
-    .logo{width:180px;margin:15px 0}
-    h1{color:#cc0000;font-family:'Impact',sans-serif;margin:10px 0}
-    .btn{display:block;width:100%;max-width:300px;padding:14px;margin:8px 0;border-radius:8px;font-weight:bold;font-size:15px;border:none;color:#fff;cursor:pointer}
-    .btn-pedir{background:#cc0000}
-    .btn-restante{background:#333;border:1px solid #444}
-    .aviso{font-size:12px;color:#888;margin-top:15px}
-    .whats{background:#25D366;color:#fff;padding:14px;border-radius:8px;margin-top:20px;display:block;text-decoration:none;font-weight:bold}
-    #modalZap{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center;z-index:999}
-    #modalZap .box{background:#111;padding:20px;border-radius:10px;width:90%;max-width:300px;position:relative}
-    #modalZap .close{position:absolute;top:8px;right:12px;font-size:24px;color:#aaa;cursor:pointer}
-    #modalZap h3{margin-bottom:10px;color:#fff;font-size:16px}
-    #modalZap input{width:100%;padding:12px;font-size:16px;margin-top:10px;border-radius:6px;border:none;background:#222;color:#fff;box-sizing:border-box}
-    #modalZap button{margin-top:12px;padding:10px;width:100%;background:#cc0000;color:#fff;border:none;border-radius:6px;font-weight:bold;font-size:16px}
+    body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
+    .btn{width:100%;max-width:320px;padding:15px;margin:8px 0;border:none;border-radius:8px;font-weight:bold;font-size:1rem;cursor:pointer}
+    .btn.disabled{background:#444;cursor:not-allowed}
+    .btn.active{background:#cc0000}
+    .aviso{font-size:0.9rem;color:#aaa;text-align:center;margin-top:12px}
 </style>
 </head>
 <body>
+<img src="Logo.png" style="width:120px;margin-bottom:12px">
+<h1>Trem do Ódio EC</h1>
 
-<img src="Logo.png" alt="Logo Trem do Ódio EC" class="logo">
-<h1>TREM DO ÓDIO EC</h1>
-<!-- Procure os botões no seu index.html e substitua por estes -->
+<button class="btn disabled" disabled>LOTE ENCERRADO (26/10)</button>
 
-<button class="btn" style="background:#444; cursor:not-allowed;" disabled>
-    LOTE ENCERRADO (25/10)
+<button class="btn active" onclick="window.location='pagamento.html'">
+    ACOMPANHAR PRODUÇÃO / PAGAR
 </button>
 
-<button class="btn btn-restante" onclick="abrirModalZap()" style="background: #cc0000; border:none;">
-    ACOMPANHAR PRODUÇÃO / PAGAR VALOR RESTANTE
-</button>
-
-<p class="aviso">O lote atual está em fabricação. Previsão de entrega: 26/11.</p>
-
-<a href="https://wa.me/5531991595612?text=Olá! Tenho dúvidas sobre a camisa do Trem do Ódio EC."
-   target="_blank" class="whats">Tenho dúvidas / Falar no WhatsApp</a>
-
-<div id="modalZap" onclick="fecharModalZap(event)">
-    <div class="box" onclick="event.stopPropagation()">
-        <span class="close" onclick="fecharModalZap()">&times;</span>
-        <h3>Digite seu WhatsApp (DDD + número)</h3>
-        <input id="zapInput" type="tel" inputmode="numeric" placeholder="ex.: 31991595612" maxlength="13">
-        <button onclick="pagarRestante()">Continuar</button>
-    </div>
-</div>
+<p class="aviso">
+    O lote atual está em fabricação. Previsão de entrega: 26/11.
+</p>
 
 <script>
-function novoPedido(){
-    // Limpa apenas o whatsapp salvo para forçar novo fluxo, mantendo outros dados se needed
-    localStorage.removeItem('user_whatsapp');
-    window.location.href='pedido.html';
-}
-
-function abrirModalZap(){ document.getElementById('modalZap').style.display='flex'; }
-function fecharModalZap(e){
-    if(e && e.target.id === 'modalZap' || !e){
-        document.getElementById('modalZap').style.display='none';
-    }
-}
-
-function pagarRestante(){
-    const raw = document.getElementById('zapInput').value.replace(/\D/g,'');
-    if(raw.length<10){
-        alert('Telefone inválido – digite ao menos 10 números.');
-        return;
-    }
-    // Salva o WhatsApp digitado no modal para a tela de pagamento buscar os pedidos
-    localStorage.setItem('user_whatsapp', raw);
-    fecharModalZap();
-    window.location.href='pagamento.html';
-}
+    // Se quiser gravar o WhatsApp do cliente já usado no fluxo anterior:
+    // localStorage.setItem('user_whatsapp','553199xxxxxx');
 </script>
 </body>
 </html>
